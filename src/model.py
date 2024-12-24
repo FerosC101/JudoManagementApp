@@ -5,7 +5,7 @@ from src.config import DB_CONFIG
 
 def create_connection():
     try:
-        conn = psycopg2.connect(**DB_CONFIG)  # Unpack the dictionary
+        conn = psycopg2.connect(**DB_CONFIG)
         return conn
     except psycopg2.Error as e:
         print(f"Error connecting to PostgreSQL: {e}")
