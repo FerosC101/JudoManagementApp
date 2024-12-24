@@ -4,11 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="sql set up">
-      <change afterPath="$PROJECT_DIR$/src/tests/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tests/test_db_connection.py" afterDir="false" />
+    <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="database connection good">
+      <change afterPath="$PROJECT_DIR$/src/auth/login.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/auth/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Database.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/requirements" beforeDir="false" afterPath="$PROJECT_DIR$/src/requirements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/test_db_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test_db_connection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +24,8 @@
       <list>
         <option value="CSS File" />
         <option value="HTML File" />
-        <option value="Python Script" />
         <option value="Python Unit Test" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -52,6 +56,8 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
+    "Python tests.Python tests in test_db_connection.py.executor": "Run",
+    "Python.config.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
@@ -66,6 +72,9 @@
   "keyToStringList": {
     "DatabaseDriversLRU": [
       "postgresql"
+    ],
+    "com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect": [
+      "PostgreSQL"
     ]
   }
 }]]></component>
@@ -111,7 +120,9 @@
       <option name="presentableId" value="Default" />
       <updated>1734938000839</updated>
       <workItem from="1734938002262" duration="1251000" />
-      <workItem from="1734960686679" duration="5889000" />
+      <workItem from="1734960686679" duration="6823000" />
+      <workItem from="1735005846122" duration="1536000" />
+      <workItem from="1735007988069" duration="300000" />
     </task>
     <task id="LOCAL-00001" summary="c">
       <option name="closed" value="true" />
@@ -129,7 +140,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734964854015</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="database connection good">
+      <option name="closed" value="true" />
+      <created>1734969821047</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1734969821047</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,7 +157,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="c" />
     <MESSAGE value="sql set up" />
-    <option name="LAST_COMMIT_MESSAGE" value="sql set up" />
+    <MESSAGE value="database connection good" />
+    <option name="LAST_COMMIT_MESSAGE" value="database connection good" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -150,5 +170,9 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/JudoManagementApp$.coverage" NAME=" Coverage Results" MODIFIED="1735006407326" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
+    <SUITE FILE_PATH="coverage/JudoManagementApp$config.coverage" NAME="config Coverage Results" MODIFIED="1735007383187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

@@ -1,15 +1,11 @@
 import psycopg2
 from psycopg2 import sql
+from src.config import DB_CONFIG
+
 
 def create_connection():
     try:
-        conn = psycopg2.connect(
-            dbname="judo_management",
-            user="vince",
-            password="426999",
-            host="localhost",
-            port="5432",
-        )
+        conn = psycopg2.connect(**DB_CONFIG)  # Unpack the dictionary
         return conn
     except psycopg2.Error as e:
         print(f"Error connecting to PostgreSQL: {e}")
@@ -20,6 +16,7 @@ def create_table():
         conn = create_connection()
         cur = conn.cursor()
 
+        # Create tables
         cur.execute('''
             CREATE TABLE IF NOT EXISTS athletes (
                 athlete_id TEXT PRIMARY KEY,
@@ -88,9 +85,9 @@ def create_table():
     except psycopg2.Error as e:
         print(f"Error creating tables: {e}")
     finally:
-        if cur:
+        if 'cur' in locals():
             cur.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
 
 def generate_athlete_id(conn):
@@ -105,7 +102,7 @@ def generate_athlete_id(conn):
         else:
             new_number = 1
 
-        current_year = "25"
+        current_year = "25"  # Adjust this logic if needed for dynamic year handling
         new_id = f"{current_year}-{new_number:04d}"
         return new_id
     except Exception as e:
@@ -119,8 +116,10 @@ def add_athlete(name, age, current_weight, weight_category):
 
     try:
         conn = create_connection()
-        athlete_id = generate_athlete_id(conn)
+        if not conn:
+            return
 
+        athlete_id = generate_athlete_id(conn)
         if not athlete_id:
             raise ValueError("Error generating athlete_id")
 
@@ -135,26 +134,28 @@ def add_athlete(name, age, current_weight, weight_category):
     except Exception as e:
         print(f"Error adding athlete: {e}")
     finally:
-        if cur:
+        if 'cur' in locals():
             cur.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
 
 def get_all_athletes():
     try:
         conn = create_connection()
-        cur = conn.cursor()
+        if not conn:
+            return []
 
+        cur = conn.cursor()
         cur.execute("SELECT * FROM athletes ORDER BY athlete_id;")
         athletes = cur.fetchall()
         return athletes
     except Exception as e:
-        print(f"Error getting athletes: {e}")
+        print(f"Error retrieving athletes: {e}")
         return []
     finally:
-        if cur:
+        if 'cur' in locals():
             cur.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
 
 def update_athlete(athlete_id, name=None, age=None, weight_category=None):
@@ -164,8 +165,10 @@ def update_athlete(athlete_id, name=None, age=None, weight_category=None):
 
     try:
         conn = create_connection()
-        cur = conn.cursor()
+        if not conn:
+            return
 
+        cur = conn.cursor()
         updates = []
         values = []
 
@@ -188,15 +191,14 @@ def update_athlete(athlete_id, name=None, age=None, weight_category=None):
             updates=sql.SQL(", ").join(sql.SQL(u) for u in updates)
         )
         cur.execute(query, values)
-
         conn.commit()
-        print(f"Athlete with ID {athlete_id} updated successfully!")
+        print(f"Athlete with ID {athlete_id} updated successfully.")
     except Exception as e:
         print(f"Error updating athlete: {e}")
     finally:
-        if cur:
+        if 'cur' in locals():
             cur.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
 
 def delete_athlete(athlete_id):
@@ -206,16 +208,17 @@ def delete_athlete(athlete_id):
 
     try:
         conn = create_connection()
-        cur = conn.cursor()
+        if not conn:
+            return
 
+        cur = conn.cursor()
         cur.execute('DELETE FROM athletes WHERE athlete_id = %s', (athlete_id,))
         conn.commit()
-
         print(f"Athlete with ID {athlete_id} deleted successfully.")
     except Exception as e:
         print(f"Error deleting athlete: {e}")
     finally:
-        if cur:
+        if 'cur' in locals():
             cur.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()

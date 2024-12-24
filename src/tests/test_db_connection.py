@@ -1,5 +1,5 @@
 import unittest
-from src.Database import create_connection
+from src.model import create_connection
 import psycopg2
 
 class TestDatabaseConnection(unittest.TestCase):
