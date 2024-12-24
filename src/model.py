@@ -2,7 +2,6 @@ import psycopg2
 from psycopg2 import sql
 from src.config import DB_CONFIG
 
-
 def create_connection():
     try:
         conn = psycopg2.connect(**DB_CONFIG)
@@ -16,7 +15,6 @@ def create_table():
         conn = create_connection()
         cur = conn.cursor()
 
-        # Create tables
         cur.execute('''
             CREATE TABLE IF NOT EXISTS athletes (
                 athlete_id TEXT PRIMARY KEY,
@@ -26,7 +24,6 @@ def create_table():
                 weight_category TEXT NOT NULL
             );
         ''')
-
         cur.execute('''
             CREATE TABLE IF NOT EXISTS training_plans (
                 training_plan_id SERIAL PRIMARY KEY,
@@ -35,7 +32,6 @@ def create_table():
                 monthly_fee REAL NOT NULL
             );
         ''')
-
         cur.execute('''
             CREATE TABLE IF NOT EXISTS athlete_training (
                 id SERIAL PRIMARY KEY,
@@ -47,7 +43,6 @@ def create_table():
                 FOREIGN KEY (training_plan_id) REFERENCES training_plans(training_plan_id)
             );
         ''')
-
         cur.execute('''
             CREATE TABLE IF NOT EXISTS competition (
                 competition_id SERIAL PRIMARY KEY,
@@ -56,7 +51,6 @@ def create_table():
                 location TEXT NOT NULL
             );
         ''')
-
         cur.execute('''
             CREATE TABLE IF NOT EXISTS athlete_competition (
                 id SERIAL PRIMARY KEY,
@@ -67,7 +61,6 @@ def create_table():
                 FOREIGN KEY (competition_id) REFERENCES competition(competition_id)
             );
         ''')
-
         cur.execute('''
             CREATE TABLE IF NOT EXISTS payments (
                 payment_id SERIAL PRIMARY KEY,
@@ -77,6 +70,14 @@ def create_table():
                 payment_date DATE NOT NULL,
                 FOREIGN KEY (athlete_id) REFERENCES athletes(athlete_id),
                 FOREIGN KEY (training_plan_id) REFERENCES training_plans(training_plan_id)
+            );
+        ''')
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id SERIAL PRIMARY KEY,
+                role TEXT NOT NULL CHECK (role IN ('athlete', 'guest')),
+                athlete_id TEXT UNIQUE,
+                FOREIGN KEY (athlete_id) REFERENCES athletes(athlete_id) ON DELETE CASCADE
             );
         ''')
 
@@ -95,14 +96,12 @@ def generate_athlete_id(conn):
         cur = conn.cursor()
         cur.execute("SELECT athlete_id FROM athletes ORDER BY athlete_id DESC LIMIT 1;")
         last_id = cur.fetchone()
-
         if last_id:
             last_number = int(last_id[0].split("-")[1])
             new_number = last_number + 1
         else:
             new_number = 1
-
-        current_year = "25"  # Adjust this logic if needed for dynamic year handling
+        current_year = "25"
         new_id = f"{current_year}-{new_number:04d}"
         return new_id
     except Exception as e:
@@ -113,22 +112,18 @@ def add_athlete(name, age, current_weight, weight_category):
     if not all([name, age, current_weight, weight_category]):
         print("All fields are required to add an athlete.")
         return
-
     try:
         conn = create_connection()
         if not conn:
             return
-
         athlete_id = generate_athlete_id(conn)
         if not athlete_id:
             raise ValueError("Error generating athlete_id")
-
         cur = conn.cursor()
         cur.execute('''
             INSERT INTO athletes(athlete_id, name, age, current_weight, weight_category) 
             VALUES (%s, %s, %s, %s, %s);
         ''', (athlete_id, name, age, current_weight, weight_category))
-
         conn.commit()
         print(f"Athlete {athlete_id} added successfully.")
     except Exception as e:
@@ -144,7 +139,6 @@ def get_all_athletes():
         conn = create_connection()
         if not conn:
             return []
-
         cur = conn.cursor()
         cur.execute("SELECT * FROM athletes ORDER BY athlete_id;")
         athletes = cur.fetchall()
@@ -162,16 +156,13 @@ def update_athlete(athlete_id, name=None, age=None, weight_category=None):
     if not athlete_id:
         print("Athlete ID is required to update an athlete.")
         return
-
     try:
         conn = create_connection()
         if not conn:
             return
-
         cur = conn.cursor()
         updates = []
         values = []
-
         if name:
             updates.append("name = %s")
             values.append(name)
@@ -181,11 +172,9 @@ def update_athlete(athlete_id, name=None, age=None, weight_category=None):
         if weight_category:
             updates.append("weight_category = %s")
             values.append(weight_category)
-
         if not updates:
             print("No fields provided to update.")
             return
-
         values.append(athlete_id)
         query = sql.SQL("UPDATE athletes SET {updates} WHERE athlete_id = %s").format(
             updates=sql.SQL(", ").join(sql.SQL(u) for u in updates)
@@ -205,12 +194,10 @@ def delete_athlete(athlete_id):
     if not athlete_id:
         print("Athlete ID is required to delete an athlete.")
         return
-
     try:
         conn = create_connection()
         if not conn:
             return
-
         cur = conn.cursor()
         cur.execute('DELETE FROM athletes WHERE athlete_id = %s', (athlete_id,))
         conn.commit()
