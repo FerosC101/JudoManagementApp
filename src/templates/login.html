@@ -7,9 +7,10 @@
     <h1>Login</h1>
     <form method="POST" action="{{ url_for('login') }}">
         <label for="user_id">User ID:</label>
-        <input type="text" name="user_id" id="user_id">
+        <input type="text" name="user_id" id="user_id" required>
         <button type="submit">Login</button>
     </form>
     <p>Or <a href="{{ url_for('guest_view') }}">continue as a guest</a>.</p>
+    <p>New here? <a href="{{ url_for('register') }}">Create an account</a>.</p>
 </body>
 </html>
