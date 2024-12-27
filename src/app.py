@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from src.utils import db
+from src.extension import db
 from src.model import Users, Athlete
 
 app = Flask(__name__, template_folder='templates')
@@ -68,3 +68,5 @@ def guest_view():
     athletes = Athlete.query.all()
     return render_template('guest_view.html', athletes=athletes)
 
+if __name__ == "__main__":
+    app.run(debug=True)

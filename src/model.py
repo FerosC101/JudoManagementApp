@@ -1,6 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from app import app
-from src.utils import db
+from src.extension import db
 
 class Athlete(db.Model):
     __tablename__ = 'Athletes'
