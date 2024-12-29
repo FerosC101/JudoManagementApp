@@ -18,13 +18,15 @@ def login():
         user = Users.query.filter_by(user_id=user_id).first()
 
         if user:
-            if user.role == 'admin':
+            if user.role == 'Admin':
                 return redirect(url_for('admin_dashboard'))
-            elif user.role == 'user':
-                return redirect(url_for('user_dashboard', athlete_id=user.athlete_id))
+            elif user.role == 'Athlete':
+                return redirect(url_for('athlete_dashboard'))
+            else:
+                return redirect(url_for('guest_dashboard'))
         else:
-            flash("User ID not found. Please try again or create an account.", "error")
-
+            flash("Invalid User ID. Please try again or create a new account.", "error")
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])

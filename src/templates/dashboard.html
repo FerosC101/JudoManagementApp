@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black and White Judo Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f4f4;
+            color: #000;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #000;
+            color: #fff;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .menu-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .menu {
+            position: relative;
+        }
+        .menu button {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #fff;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .menu button:hover {
+            color: #ccc;
+        }
+        .menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .menu-content a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+        }
+        .menu-content a:hover {
+            background: #f4f4f4;
+        }
+        .menu:hover .menu-content {
+            display: block;
+        }
+        .navbar nav {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .navbar nav a:hover {
+            color: #ccc;
+        }
+        .section {
+            margin: 20px;
+        }
+        .section h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            color: #000;
+        }
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 0;
+        }
+        .scroll-container::-webkit-scrollbar {
+            height: 10px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 5px;
+        }
+        .card {
+            flex: 0 0 auto;
+            width: 200px;
+            height: 120px;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1rem;
+            color: #000;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>JUDO</h1>
+        <div class="menu-bar">
+            <div class="menu">
+                <button>&#9776;</button>
+                <div class="menu-content">
+                    <a href="#profile">Profile</a>
+                    <a href="#logout">Logout</a>
+                </div>
+            </div>
+            <nav>
+                <a href="#athletes">Athletes</a>
+                <a href="#plans">Plans</a>
+                <a href="#competitions">Competitions</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="section" id="athletes">
+        <h2>Athletes</h2>
+        <div class="scroll-container">
+            <div class="card">Athlete 1</div>
+            <div class="card">Athlete 2</div>
+            <div class="card">Athlete 3</div>
+            <div class="card">Athlete 4</div>
+            <div class="card">Athlete 5</div>
+            <div class="card">Athlete 6</div>
+            <div class="card">Athlete 7</div>
+            <div class="card">Athlete 8</div>
+            <div class="card">Athlete 9</div>
+            <div class="card">Athlete 10</div>
+        </div>
+    </div>
+
+    <div class="section" id="plans">
+        <h2>Plans</h2>
+        <div class="scroll-container">
+            <div class="card">Plan 1</div>
+            <div class="card">Plan 2</div>
+            <div class="card">Plan 3</div>
+            <div class="card">Plan 4</div>
+            <div class="card">Plan 5</div>
+            <div class="card">Plan 6</div>
+            <div class="card">Plan 7</div>
+            <div class="card">Plan 8</div>
+            <div class="card">Plan 9</div>
+            <div class="card">Plan 10</div>
+        </div>
+    </div>
+
+    <div class="section" id="competitions">
+        <h2>Competitions</h2>
+        <div class="scroll-container">
+            <div class="card">Competition 1</div>
+            <div class="card">Competition 2</div>
+            <div class="card">Competition 3</div>
+            <div class="card">Competition 4</div>
+            <div class="card">Competition 5</div>
+            <div class="card">Competition 6</div>
+            <div class="card">Competition 7</div>
+            <div class="card">Competition 8</div>
+            <div class="card">Competition 9</div>
+            <div class="card">Competition 10</div>
+        </div>
+    </div>
+</body>
+</html>
