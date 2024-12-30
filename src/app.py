@@ -11,23 +11,29 @@ db.init_app(app)
 def home():
     return render_template('login.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        user = Users.query.filter_by(user_id=user_id).first()
+        user_id = request.form.get('user_id')  # Fetch the user ID from the form
+        user = Users.query.filter_by(user_id=user_id).first()  # Query the database for the user
 
-        if user:
+        if user:  # If a user with the given ID exists
+            session['user_id'] = user.user_id  # Store the user's ID in the session
+            session['role'] = user.role  # Store the user's role in the session
+
+            # Redirect based on user role
             if user.role == 'Admin':
                 return redirect(url_for('admin_dashboard'))
             elif user.role == 'Athlete':
-                return redirect(url_for('athlete_dashboard'))
+                return redirect(url_for('dashboard.html'))  # Athlete goes to 'dashboard.html'
             else:
                 return redirect(url_for('guest_dashboard'))
         else:
             flash("Invalid User ID. Please try again or create a new account.", "error")
             return redirect(url_for('login'))
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

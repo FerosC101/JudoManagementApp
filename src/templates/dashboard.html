@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Black and White Judo Dashboard</title>
+    <title>Netflix-Inspired Judo Dashboard</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background: #f4f4f4;
-            color: #000;
+            background: #141414;
+            color: #e5e5e5;
         }
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 30px;
-            background: #000;
-            color: #fff;
+            background: #181818;
+            color: #e50914;
+            border-bottom: 2px solid #e50914;
         }
         .navbar h1 {
             margin: 0;
             font-size: 2.5rem;
+            color: #e50914;
         }
         .menu-bar {
             display: flex;
@@ -36,20 +38,20 @@
             background: none;
             border: none;
             font-size: 1.8rem;
-            color: #fff;
+            color: #e5e5e5;
             cursor: pointer;
             padding: 5px;
         }
         .menu button:hover {
-            color: #ccc;
+            color: #e50914;
         }
         .menu-content {
             display: none;
             position: absolute;
             right: 0;
-            background: #fff;
-            color: #000;
-            border: 1px solid #ccc;
+            background: #181818;
+            color: #e5e5e5;
+            border: 1px solid #333;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 1;
             border-radius: 5px;
@@ -58,11 +60,11 @@
             display: block;
             padding: 10px 15px;
             text-decoration: none;
-            color: #000;
+            color: #e5e5e5;
             font-weight: bold;
         }
         .menu-content a:hover {
-            background: #f4f4f4;
+            background: #333;
         }
         .menu:hover .menu-content {
             display: block;
@@ -72,13 +74,13 @@
             gap: 20px;
         }
         .navbar nav a {
-            color: #fff;
+            color: #e5e5e5;
             text-decoration: none;
             font-weight: bold;
             font-size: 1.2rem;
         }
         .navbar nav a:hover {
-            color: #ccc;
+            color: #e50914;
         }
         .section {
             margin: 20px;
@@ -87,7 +89,7 @@
             margin-bottom: 10px;
             font-size: 1.5rem;
             text-transform: uppercase;
-            color: #000;
+            color: #e5e5e5;
         }
         .scroll-container {
             display: flex;
@@ -99,28 +101,28 @@
             height: 10px;
         }
         .scroll-container::-webkit-scrollbar-thumb {
-            background: #ccc;
+            background: #333;
             border-radius: 5px;
         }
         .card {
             flex: 0 0 auto;
             width: 200px;
             height: 120px;
-            background: #fff;
-            border: 1px solid #000;
+            background: #181818;
+            border: 1px solid #333;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             font-size: 1rem;
-            color: #000;
+            color: #e5e5e5;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
             transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: #f4f4f4;
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+            background: #333;
         }
     </style>
 </head>
@@ -128,6 +130,11 @@
     <div class="navbar">
         <h1>JUDO</h1>
         <div class="menu-bar">
+            <nav>
+                <a href="#athletes">Athletes</a>
+                <a href="#plans">Plans</a>
+                <a href="#competitions">Competitions</a>
+            </nav>
             <div class="menu">
                 <button>&#9776;</button>
                 <div class="menu-content">
@@ -135,11 +142,6 @@
                     <a href="#logout">Logout</a>
                 </div>
             </div>
-            <nav>
-                <a href="#athletes">Athletes</a>
-                <a href="#plans">Plans</a>
-                <a href="#competitions">Competitions</a>
-            </nav>
         </div>
     </div>
 

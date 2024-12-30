@@ -9,52 +9,64 @@
             font-family: Arial, sans-serif;
             background: url('src/static/assets/sports-tools.jpg') no-repeat center center fixed;
             background-size: cover;
+            background-color: #222; /* Fallback color */
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: #fff;
         }
         .login-container {
-            background: #E3F2FD;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            background: rgba(35, 35, 35, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             text-align: center;
-            width: 300px;
+            width: 350px;
         }
         .login-container h2 {
             margin-bottom: 20px;
+            color: #FFCDD2; /* Light red for the heading */
+            font-size: 1.8rem;
         }
         .login-container input {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            width: 90%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+        .login-container input:focus {
+            border: 2px solid #F44336; /* Red border on focus */
         }
         .login-container button {
-            width: 85%;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #2196F3;
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background-color: #F44336; /* Primary red color */
             color: white;
+            font-size: 1rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         .login-container button:hover {
-            background-color: #1976D2;
+            background-color: #D32F2F; /* Darker red on hover */
         }
         .login-container a {
-            color: #2196F3;
+            color: #F44336; /* Red for links */
             text-decoration: none;
+            font-size: 0.9rem;
         }
         .login-container a:hover {
             text-decoration: underline;
         }
-        <img src="../static/assets/sports-tools.jpg" height="720" width="1080"/></style>
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -66,5 +78,6 @@
         <p>Login as <a href="/guest">Guest</a></p>
         <p>Create a new account? <a href="/register">Click here</a></p>
     </div>
+
 </body>
 </html>

@@ -1,14 +1,14 @@
 from src.extension import db
+from datetime import datetime
+
 
 class Athlete(db.Model):
-    __tablename__ = 'Athletes'
+    __tablename__ = 'athletes'
     athlete_id = db.Column(db.String(10), primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    weight_category = db.Column(db.String(20))
-    contact_info = db.Column(db.String(100))
-    registration_date = db.Column(db.DateTime)
+    name = db.Column(db.String(100), nullable=False)
+    age = db.Column(db.Integer, nullable=False)  # Added based on the diagram
+    current_weight = db.Column(db.Float, nullable=False)  # Renamed to match the diagram
+    weight_category = db.Column(db.String(20), nullable=True)
 
     @staticmethod
     def generate_athlete_id(conn):
@@ -30,34 +30,63 @@ class Athlete(db.Model):
 
 
 class TrainingPlan(db.Model):
-    __tablename__ = 'Training_Plans'
-    plan_id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'training_plans'
+    training_plan_id = db.Column(db.Integer, primary_key=True)  # Corrected column name
     plan_name = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.Text)
-    start_date = db.Column(db.Date)
-    end_date = db.Column(db.Date)
+    description = db.Column(db.Text, nullable=True)
+    monthly_fee = db.Column(db.Float, nullable=False)  # Changed to Float to match `real`
+
 
 class Competition(db.Model):
-    __tablename__ = 'Competitions'
+    __tablename__ = 'competition'
     competition_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    location = db.Column(db.String(100))
-    date = db.Column(db.Date)
-    weight_category = db.Column(db.String(20))
+    competition_name = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(100), nullable=True)
+    date = db.Column(db.Date, nullable=True)
+
 
 class Payment(db.Model):
-    __tablename__ = 'Payments'
+    __tablename__ = 'payments'
     payment_id = db.Column(db.Integer, primary_key=True)
-    athlete_id = db.Column(db.Integer, db.ForeignKey('Athletes.athlete_id'))
-    amount = db.Column(db.Numeric(10, 2), nullable=False)
-    payment_date = db.Column(db.DateTime)
+    athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'), nullable=False)
+    training_plan_id = db.Column(db.Integer, db.ForeignKey('training_plans.training_plan_id'), nullable=False)  # Added based on the diagram
+    amount = db.Column(db.Float, nullable=False)  # Changed to Float to match `real`
+    payment_date = db.Column(db.Date, default=datetime.utcnow, nullable=False)
     payment_method = db.Column(db.String(20), nullable=False)
-    
+
+
 class Users(db.Model):
-    __tablename__ = 'Users'
-    user_id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'users'
+    user_id = db.Column(db.String(20), primary_key=True)  # Changed to String
     role = db.Column(db.String(50), nullable=False)
-    athlete_id = db.Column(db.Integer, db.ForeignKey('Athletes.athlete_id'))
+    athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'))
+
+    athlete = db.relationship('Athlete', backref='users')
+
+
+
+class AthleteCompetition(db.Model):
+    __tablename__ = 'athlete_competition'
+    id = db.Column(db.Integer, primary_key=True)
+    athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'), nullable=False)
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.competition_id'), nullable=False)
+    registration_date = db.Column(db.Date, nullable=False)
+
+    athlete = db.relationship('Athlete', backref='competitions')
+    competition = db.relationship('Competition', backref='participants')
+
+
+class AthleteTraining(db.Model):
+    __tablename__ = 'athlete_training'
+    id = db.Column(db.Integer, primary_key=True)
+    athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'), nullable=False)
+    training_plan_id = db.Column(db.Integer, db.ForeignKey('training_plans.training_plan_id'), nullable=False)  # Corrected column name
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)
+
+    athlete = db.relationship('Athlete', backref='trainings')
+    training_plan = db.relationship('TrainingPlan', backref='athlete_assignments')
+
 
 # Raw SQL Table Creation
 # Not sure which one to use so I made both of them
