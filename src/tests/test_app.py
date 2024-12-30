@@ -1,7 +1,7 @@
 import unittest
-from flask import url_for
-from src.app import app, db
+from src.app import app,db
 from src.model import Users, Athlete
+from src.extension import db
 
 
 class FlaskAppTestCase(unittest.TestCase):

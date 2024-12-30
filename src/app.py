@@ -11,29 +11,29 @@ db.init_app(app)
 def home():
     return render_template('login.html')
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')  # Fetch the user ID from the form
-        user = Users.query.filter_by(user_id=user_id).first()  # Query the database for the user
+        user_id = request.form.get('user_id')
+        print(f"User ID entered: {user_id}")  # Debug statement
 
-        if user:  # If a user with the given ID exists
-            session['user_id'] = user.user_id  # Store the user's ID in the session
-            session['role'] = user.role  # Store the user's role in the session
+        user = Users.query.filter_by(user_id=user_id).first()
+        print(f"User fetched: {user}")  # Debug statement
 
-            # Redirect based on user role
+        if user:
+            session['user_id'] = user.user_id
+            session['role'] = user.role
+
             if user.role == 'Admin':
                 return redirect(url_for('admin_dashboard'))
             elif user.role == 'Athlete':
-                return redirect(url_for('dashboard.html'))  # Athlete goes to 'dashboard.html'
+                return redirect(url_for('dashboard'))
             else:
                 return redirect(url_for('guest_dashboard'))
         else:
             flash("Invalid User ID. Please try again or create a new account.", "error")
             return redirect(url_for('login'))
     return render_template('login.html')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -42,7 +42,7 @@ def register():
         age = request.form.get('age')
         current_weight = request.form.get('current_weight')
         weight_category = request.form.get('weight_category')
-        role = request.form.get('role')  # 'user' or 'admin'
+        role = request.form.get('role')
 
         new_athlete = Athlete(
             name=name,
@@ -61,9 +61,7 @@ def register():
         db.session.commit()
 
         return redirect(url_for('login'))
-
     return render_template('register.html')
-
 
 @app.route('/dashboard')
 def dashboard():

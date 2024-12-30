@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('src/static/assets/sports-tools.jpg') no-repeat center center fixed;
+            background: url('{{ url_for('static', filename='assets/sports-tools.jpg') }}') no-repeat center center fixed;
             background-size: cover;
             background-color: #222; /* Fallback color */
             margin: 0;
@@ -71,13 +71,16 @@
 <body>
     <div class="login-container">
         <h2>Enter User ID:</h2>
-        <form method="POST" action="/login">
+        <form method="POST" action="{{ url_for('login') }}">
+            <!-- CSRF Token (Optional) -->
+            {% if csrf_token %}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
             <input type="text" name="user_id" placeholder="Enter User ID" required>
             <button type="submit">Login</button>
         </form>
-        <p>Login as <a href="/guest">Guest</a></p>
-        <p>Create a new account? <a href="/register">Click here</a></p>
+        <p>Login as <a href="{{ url_for('guest_view') }}">Guest</a></p>
+        <p>Create a new account? <a href="{{ url_for('register') }}">Click here</a></p>
     </div>
-
 </body>
 </html>
