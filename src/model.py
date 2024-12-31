@@ -5,7 +5,7 @@ from datetime import datetime
 # Athlete Model
 class Athlete(db.Model):
     __tablename__ = 'athletes'
-    athlete_id = db.Column(db.String(10), primary_key=True)  # Format: '25-0001'
+    athlete_id = db.Column(db.String(10), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     current_weight = db.Column(db.Float, nullable=False)
@@ -14,13 +14,8 @@ class Athlete(db.Model):
     @staticmethod
     def generate_athlete_id():
         last_athlete = Athlete.query.order_by(Athlete.athlete_id.desc()).first()
-        if last_athlete:
-            last_number = int(last_athlete.athlete_id.split("-")[1])
-            new_number = last_number + 1
-        else:
-            new_number = 1
-        current_year = datetime.now().strftime('%y')  # Get the last two digits of the current year
-        return f"{current_year}-{new_number:04d}"
+        last_number = int(last_athlete.athlete_id.split('-')[1]) if last_athlete else 0
+        return f"{datetime.now().strftime('%y')}-{last_number + 1:04d}"
 
 
 # Training Plan Model
@@ -55,7 +50,7 @@ class Payment(db.Model):
 # Users Model
 class User(db.Model):
     __tablename__ = 'users'
-    user_id = db.Column(db.String(20), primary_key=True)
+    user_id = db.Column(db.String(20), primary_key=True)  # Make sure this is TEXT
     role = db.Column(db.String(50), nullable=False)
     athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'), unique=True)
 
