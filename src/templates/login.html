@@ -7,76 +7,122 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('{{ url_for('static', filename='assets/sports-tools.jpg') }}') no-repeat center center fixed;
-            background-size: cover;
-            background-color: #222; /* Fallback color */
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #fff;
+            color: #f5f5dc; /* Cream */
+            background-color: #2c2c2c; /* Deep Gray */
         }
+
         .login-container {
-            background: rgba(35, 35, 35, 0.9);
+            background: #3c3c3c; /* Slightly lighter deep gray */
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 350px;
+            width: 100%;
+            max-width: 400px;
         }
+
         .login-container h2 {
             margin-bottom: 20px;
-            color: #FFCDD2; /* Light red for the heading */
+            color: #ffca28; /* Mustard Yellow */
             font-size: 1.8rem;
         }
+
         .login-container input {
             width: 90%;
             padding: 12px;
             margin: 15px 0;
             border-radius: 6px;
-            border: none;
+            border: 1px solid #5a5a5a;
             outline: none;
             font-size: 1rem;
+            background-color: #2c2c2c;
+            color: #f5f5dc;
         }
+
         .login-container input:focus {
-            border: 2px solid #F44336; /* Red border on focus */
+            border: 2px solid #1e40af; /* Ultramarine */
+            box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
         }
+
         .login-container button {
             width: 100%;
             padding: 12px;
             margin: 15px 0;
-            background-color: #F44336; /* Primary red color */
-            color: white;
+            background-color: #ffca28; /* Mustard Yellow */
+            color: #2c2c2c; /* Deep Gray */
             font-size: 1rem;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .login-container button:hover {
-            background-color: #D32F2F; /* Darker red on hover */
+            background-color: #ffb300; /* Slightly darker mustard yellow */
         }
+
         .login-container a {
-            color: #F44336; /* Red for links */
+            color: #ffca28; /* Mustard Yellow */
             text-decoration: none;
             font-size: 0.9rem;
         }
+
         .login-container a:hover {
             text-decoration: underline;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .flash {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .flash.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>Enter User ID:</h2>
+        <h2>Enter User ID</h2>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
         <form method="POST" action="{{ url_for('login') }}">
-            <!-- CSRF Token (Optional) -->
             {% if csrf_token %}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% endif %}
-            <input type="text" name="user_id" placeholder="Enter User ID" required>
+            <input type="text" name="user_id" placeholder="Enter User ID" aria-label="User ID" required>
             <button type="submit">Login</button>
         </form>
         <p>Login as <a href="{{ url_for('guest_view') }}">Guest</a></p>
