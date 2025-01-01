@@ -88,16 +88,17 @@ def dashboard():
         return redirect(url_for('login'))  # Handle non-existent athlete
 
     # Fetch related data
-    trainings = Athlete.query.all()
+    athletes = Athlete.query.all()
+    plans = TrainingPlan.query.all()
     competitions = AthleteCompetition.query.all()
-    payments = Payment.query.all()
+
 
     # Debugging output for the fetched data
-    print(f"Trainings: {trainings}")
+    print(f"athlete: {athletes}")
     print(f"Competitions: {competitions}")
-    print(f"Payments: {payments}")
+    print(f"TrainingPlan: {plans}")
 
-    return render_template('dashboard.html', athlete=athlete, trainings=trainings, competitions=competitions, payments=payments)
+    return render_template('dashboard.html', athletes=athletes, plans=plans, competitions=competitions)
 
 
 
