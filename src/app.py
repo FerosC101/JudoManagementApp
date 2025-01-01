@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from src.extension import db
-from src.model import User, Athlete, TrainingPlan, Competition, Payment, AthleteCompetition, AthleteTraining
+from src.model import User, Athlete
+import datetime
 
 app = Flask(__name__, template_folder='templates')
 app.config.from_object('config.Config')
@@ -16,20 +17,33 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        user = User.query.filter_by(user_id=user_id).first()
+        # Debugging: Check form data
+        print(request.form)
 
-        if user:
-            session['user_id'] = user.user_id
-            session['role'] = user.role
+        athlete_id = request.form.get('athlete_id')
+        if not athlete_id:
+            flash("Athlete ID cannot be empty. Please try again.", "error")
+            return render_template('login.html')
 
-            if user.role == 'Admin':
+        athlete_id = athlete_id.strip()
+
+        # Fetch the athlete using the function
+        athlete = get_athlete_by_id(athlete_id)
+
+        if athlete:
+            session['athlete_id'] = athlete.athlete_id  # Store athlete ID in session
+            session['role'] = athlete.role  # Assuming the role is stored in the Athlete model
+
+            # Redirect based on the role
+            if athlete.role == 'Admin':
                 return redirect(url_for('admin_dashboard'))
-            elif user.role == 'Athlete':
+            elif athlete.role == 'Athlete':
                 return redirect(url_for('dashboard'))
             else:
                 return redirect(url_for('guest_view'))
-        flash("Invalid User ID. Please try again or register.", "error")
+        else:
+            flash("Invalid Athlete ID. Please try again or register.", "error")
+
     return render_template('login.html')
 
 # Register Route
@@ -47,7 +61,7 @@ def register():
 
         try:
             # Generate athlete_id
-            athlete_id = Athlete.generate_athlete_id()
+            athlete_id = f"{datetime.datetime.now().year}-{Athlete.query.count() + 1:04d}"
 
             # Create Athlete
             new_athlete = Athlete(
@@ -61,7 +75,7 @@ def register():
             db.session.commit()
 
             # Create User (athlete role)
-            new_user = User(user_id=athlete_id, role='athlete', athlete_id=athlete_id)
+            new_user = User(user_id=athlete_id, role='Athlete', athlete_id=athlete_id)
             db.session.add(new_user)
             db.session.commit()
 
@@ -100,7 +114,7 @@ def guest_view():
 @app.route('/guest_register', methods=['POST'])
 def guest_register():
     try:
-        new_user = User(user_id=f"guest-{int(datetime.now().timestamp())}", role="Guest")
+        new_user = User(user_id=f"guest-{int(datetime.datetime.now().timestamp())}", role="Guest")
         db.session.add(new_user)
         db.session.commit()
         flash("Guest registration successful!", "success")
@@ -108,6 +122,31 @@ def guest_register():
         db.session.rollback()
         flash(f"Error: {e}", "error")
     return redirect(url_for('login'))
+
+def get_athlete_by_id(athlete_id):
+    """
+    Retrieves an athlete from the database by athlete_id (string).
+
+    Parameters:
+        athlete_id (str): The athlete ID to search for (e.g., '23-0001').
+
+    Returns:
+        Athlete object if found, None otherwise.
+    """
+    try:
+        # Query the database for the athlete
+        athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
+
+        if athlete:
+            return athlete  # Return the Athlete object if found
+        else:
+            flash("Invalid Athlete ID. Please try again or register.", "error")
+            return None
+
+    except Exception as e:
+        flash(f"An error occurred while retrieving the athlete: {str(e)}", "error")
+        return None
+
 
 # Run Application
 if __name__ == "__main__":

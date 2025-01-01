@@ -104,7 +104,7 @@
 </head>
 <body>
     <div class="login-container">
-        <h2>Enter User ID</h2>
+        <h2>Enter Athlete ID</h2>
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=True) %}
@@ -122,7 +122,7 @@
             {% if csrf_token %}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% endif %}
-            <input type="text" name="user_id" placeholder="Enter User ID" aria-label="User ID" required>
+            <input type="text" name="athlete_id" placeholder="Enter Athlete ID" aria-label="Athlete ID" required>
             <button type="submit">Login</button>
         </form>
         <p>Login as <a href="{{ url_for('guest_view') }}">Guest</a></p>
