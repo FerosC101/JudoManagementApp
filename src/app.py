@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from src.extension import db
-from src.model import User, Athlete, AthleteTraining, AthleteCompetition, Payment, TrainingPlan, Competition
+from src.model import User, Athlete, TrainingPlan, Competition
 import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -44,7 +44,6 @@ def login():
 
     return render_template('login.html')
 
-
 # Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -54,14 +53,18 @@ def register():
         weight = request.form.get('weight')
         weight_category = request.form.get('weight_category')
 
+        # Debugging: Print out the form data
+        print(f"Name: {name}, Age: {age}, Weight: {weight}, Category: {weight_category}")
+
         if not name or not age or not weight or not weight_category:
             flash("All fields are required.", "error")
             return render_template('register.html')
 
+        # Generate unique athlete_id
         athlete_id = Athlete.generate_athlete_id()
 
-        athlete = Athlete(athlete_id=athlete_id, name=name, age=int(age), current_weight=float(weight), weight_category=weight_category)
         try:
+            athlete = Athlete(athlete_id=athlete_id, name=name, age=int(age), current_weight=float(weight), weight_category=weight_category)
             db.session.add(athlete)
             db.session.commit()
 
@@ -73,8 +76,9 @@ def register():
             flash("Registration successful! You can now log in.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            db.session.rollback()
+            db.session.rollback()  # Rollback on error
             flash(f"Error during registration: {e}", "error")
+            return render_template('register.html')
 
     return render_template('register.html')
 
@@ -94,7 +98,6 @@ def dashboard():
     competitions = Competition.query.all()
 
     return render_template('dashboard.html', athletes=athletes, plans=plans, competitions=competitions)
-
 
 # Admin Dashboard Route
 @app.route('/admin_dashboard')
