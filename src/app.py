@@ -76,30 +76,27 @@ def register():
 
     return render_template('register.html')
 
-# Athlete Dashboard Route
 @app.route('/dashboard')
 def dashboard():
     athlete_id = session.get('athlete_id')
     if not athlete_id:
-        return redirect(url_for('login'))  # Ensure athlete is logged in
+        return redirect(url_for('login'))  # Ensure the athlete is logged in
 
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
     if not athlete:
         return redirect(url_for('login'))  # Handle non-existent athlete
 
-    # Fetch related data
-    athletes = Athlete.query.all()
-    plans = TrainingPlan.query.all()
-    competitions = AthleteCompetition.query.all()
+    # Fetch all athletes, training plans, and competitions
+    athletes = Athlete.query.all()  # All athletes
+    plans = TrainingPlan.query.all()  # All training plans
+    competitions = Competition.query.all()  # All competitions
 
-
-    # Debugging output for the fetched data
-    print(f"athlete: {athletes}")
+    # Debugging output for verification
+    print(f"Athletes: {athletes}")
+    print(f"Plans: {plans}")
     print(f"Competitions: {competitions}")
-    print(f"TrainingPlan: {plans}")
 
     return render_template('dashboard.html', athletes=athletes, plans=plans, competitions=competitions)
-
 
 
 # Admin Dashboard Route

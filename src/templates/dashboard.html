@@ -5,82 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
-        /* Keep the existing styles as they are */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background: #2c2c2c; /* Deep Gray */
-            color: #f5f5dc; /* Cream */
+            background: #2c2c2c;
+            color: #f5f5dc;
         }
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 30px;
-            background: #3c3c3c; /* Slightly lighter deep gray */
-            color: #ffca28; /* Mustard Yellow */
+            background: #3c3c3c;
+            color: #ffca28;
             border-bottom: 2px solid #ffca28;
         }
         .navbar h1 {
             margin: 0;
             font-size: 2.5rem;
-            color: #ffca28; /* Mustard Yellow */
-        }
-        .menu-bar {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .menu {
-            position: relative;
-        }
-        .menu button {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: #f5f5dc; /* Cream */
-            cursor: pointer;
-            padding: 5px;
-        }
-        .menu button:hover {
-            color: #ffca28; /* Mustard Yellow */
-        }
-        .menu-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background: #3c3c3c; /* Slightly lighter deep gray */
-            color: #f5f5dc; /* Cream */
-            border: 1px solid #5a5a5a;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1;
-            border-radius: 5px;
-        }
-        .menu-content a {
-            display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #f5f5dc; /* Cream */
-            font-weight: bold;
-        }
-        .menu-content a:hover {
-            background: #2c2c2c; /* Deep Gray */
-        }
-        .menu:hover .menu-content {
-            display: block;
-        }
-        .navbar nav {
-            display: flex;
-            gap: 20px;
+            color: #ffca28;
         }
         .navbar nav a {
-            color: #f5f5dc; /* Cream */
+            color: #f5f5dc;
             text-decoration: none;
             font-weight: bold;
             font-size: 1.2rem;
+            margin-left: 20px;
         }
         .navbar nav a:hover {
-            color: #ffca28; /* Mustard Yellow */
+            color: #ffca28;
         }
         .section {
             margin: 20px;
@@ -88,42 +41,41 @@
         .section h2 {
             margin-bottom: 10px;
             font-size: 1.5rem;
-            text-transform: uppercase;
-            color: #ffca28; /* Mustard Yellow */
+            color: #ffca28;
         }
         .scroll-container {
             display: flex;
-            overflow-x: auto;
             gap: 10px;
+            overflow-x: auto;
             padding: 10px 0;
-        }
-        .scroll-container::-webkit-scrollbar {
-            height: 10px;
-        }
-        .scroll-container::-webkit-scrollbar-thumb {
-            background: #5a5a5a; /* Dark Gray */
-            border-radius: 5px;
         }
         .card {
             flex: 0 0 auto;
-            width: 200px;
+            width: 150px;
             height: 120px;
-            background: #3c3c3c; /* Slightly lighter deep gray */
+            background: #3c3c3c;
             border: 1px solid #5a5a5a;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-size: 3rem;
-            color: #f5f5dc; /* Cream */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1.5rem;
+            color: #f5f5dc;
             cursor: pointer;
+            position: relative;
         }
-        .card:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(255, 202, 40, 0.3);
-            background: #2c2c2c; /* Deep Gray */
+        .card::before {
+            content: attr(data-label);
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #ffca28;
+            color: #2c2c2c;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 1rem;
+            font-weight: bold;
         }
         .modal {
             display: none;
@@ -145,20 +97,21 @@
             max-width: 600px;
             width: 80%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
         .modal-content h3 {
-            margin-top: 0;
-            color: #ffca28; /* Mustard Yellow */
+            margin: 0;
+            color: #ffca28;
         }
         .modal-content p {
             margin: 10px 0;
         }
         .close {
-            color: #ffca28;
-            font-size: 1.5rem;
             position: absolute;
             top: 10px;
             right: 10px;
+            font-size: 1.5rem;
+            color: #ffca28;
             cursor: pointer;
         }
     </style>
@@ -166,57 +119,46 @@
 <body>
     <div class="navbar">
         <h1>JUDO</h1>
-        <div class="menu-bar">
-            <nav>
-                <a href="#athletes">Athletes</a>
-                <a href="#plans">Plans</a>
-                <a href="#competitions">Competitions</a>
-            </nav>
-            <div class="menu">
-                <button>&#9776;</button>
-                <div class="menu-content">
-                    <a href="#profile">Profile</a>
-                    <a href="#logout">Logout</a>
-                </div>
-            </div>
-        </div>
+        <nav>
+            <a href="#athletes">Athletes</a>
+            <a href="#plans">Plans</a>
+            <a href="#competitions">Competitions</a>
+        </nav>
     </div>
 
     <div class="section" id="athletes">
-    <h2>Athletes</h2>
-    <div class="scroll-container">
-        {% for athlete in athletes %}
-        <div class="card">
-            {{ athlete.name }}
+        <h2>Athletes</h2>
+        <div class="scroll-container">
+            {% for athlete in athletes %}
+            <div class="card" data-label="A" onclick="showDetails('Athlete: {{ athlete.name }}', 'ID: {{ athlete.id }}')">
+                {{ athlete.name }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
 
-<div class="section" id="plans">
-    <h2>Plans</h2>
-    <div class="scroll-container">
-        {% for training in trainings %}
-        <div class="card">
-            {{ training.plan_name }}
+    <div class="section" id="plans">
+        <h2>Plans</h2>
+        <div class="scroll-container">
+            {% for plan in plans %}
+            <div class="card" data-label="P" onclick="showDetails('Plan: {{ plan.plan_name }}', 'Details: {{ plan.details }}')">
+                {{ plan.plan_name }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
 
-<div class="section" id="competitions">
-    <h2>Competitions</h2>
-    <div class="scroll-container">
-        {% for competition in competitions %}
-        <div class="card">
-            {{ competition.competition_name }}
+    <div class="section" id="competitions">
+        <h2>Competitions</h2>
+        <div class="scroll-container">
+            {% for competition in competitions %}
+            <div class="card" data-label="C" onclick="showDetails('Competition: {{ competition.competition_name }}', 'Date: {{ competition.date }}')">
+                {{ competition.competition_name }}
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
 
-
-    <!-- Modal for detailed view -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -226,16 +168,10 @@
     </div>
 
     <script>
-        function openModal(cardId) {
+        function showDetails(title, description) {
             const modal = document.getElementById("modal");
-            const title = document.getElementById("modal-title");
-            const description = document.getElementById("modal-description");
-
-            // Fetch data dynamically based on cardId (e.g., from a database or API)
-            // For now, this is just an example.
-            title.textContent = "Dynamic Title for " + cardId;
-            description.textContent = "Details for " + cardId;
-
+            document.getElementById("modal-title").textContent = title;
+            document.getElementById("modal-description").textContent = description;
             modal.style.display = "flex";
         }
 
