@@ -29,6 +29,9 @@ class TrainingPlan(db.Model):
     plan_name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text, nullable=True)
     monthly_fee = db.Column(db.Float, nullable=False)
+    weekly_fee = db.Column(db.Float, nullable=True)  # Added weekly fee
+    private_hourly_fee = db.Column(db.Float, nullable=True)  # Added private hourly fee
+    category = db.Column(db.String(20), nullable=False)  # Added category field with values Beginner, Intermediate, Elite
 
     # Updated backref for reverse relationship to avoid conflict
     athlete_assignments = db.relationship('AthleteTraining', backref='training_plan_for_athlete', lazy=True)
@@ -41,6 +44,8 @@ class Competition(db.Model):
     competition_name = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(100), nullable=True)
     date = db.Column(db.Date, nullable=True)
+    weight_category = db.Column(db.String(20), nullable=False)  # Added weight category
+    entry_fee = db.Column(db.Float, nullable=False)  # Added entry fee for competitions
 
     # Updated backref for reverse relationship to avoid conflict
     competition_participants = db.relationship('AthleteCompetition', backref='competition_for_athlete', lazy=True)
@@ -97,4 +102,3 @@ class AthleteTraining(db.Model):
 
     athlete = db.relationship('Athlete', backref='athlete_for_training')  # Updated backref name
     training_plan = db.relationship('TrainingPlan', backref='athlete_trainings')  # Changed the backref name here
-

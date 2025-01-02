@@ -29,14 +29,12 @@ def login():
 
         if athlete_data:
             session['athlete_id'] = athlete_data['athlete'].athlete_id
-            session['role'] = athlete_data['role'].lower()  # Make sure the role is stored in lowercase
-
-            print(f"Role: {athlete_data['role']}")  # Debugging
+            session['role'] = athlete_data['role'].lower()
 
             # Redirect based on the role
-            if athlete_data['role'] == 'admin':  # Make sure this matches the stored role in lowercase
+            if athlete_data['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
-            elif athlete_data['role'] == 'athlete':  # Make sure this matches the stored role in lowercase
+            elif athlete_data['role'] == 'athlete':
                 return redirect(url_for('dashboard'))
             else:
                 return redirect(url_for('guest_view'))
@@ -56,23 +54,27 @@ def register():
         weight = request.form.get('weight')
         weight_category = request.form.get('weight_category')
 
-        if not name or not age or not weight:
+        if not name or not age or not weight or not weight_category:
             flash("All fields are required.", "error")
             return render_template('register.html')
 
         athlete_id = Athlete.generate_athlete_id()
 
         athlete = Athlete(athlete_id=athlete_id, name=name, age=int(age), current_weight=float(weight), weight_category=weight_category)
-        db.session.add(athlete)
-        db.session.commit()
+        try:
+            db.session.add(athlete)
+            db.session.commit()
 
-        # Add user to users table
-        user = User(user_id=athlete_id, role='athlete', athlete_id=athlete_id)
-        db.session.add(user)
-        db.session.commit()
+            # Add user to users table
+            user = User(user_id=athlete_id, role='athlete', athlete_id=athlete_id)
+            db.session.add(user)
+            db.session.commit()
 
-        flash("Registration successful! You can now log in.", "success")
-        return redirect(url_for('login'))
+            flash("Registration successful! You can now log in.", "success")
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error during registration: {e}", "error")
 
     return render_template('register.html')
 
@@ -80,21 +82,16 @@ def register():
 def dashboard():
     athlete_id = session.get('athlete_id')
     if not athlete_id:
-        return redirect(url_for('login'))  # Ensure the athlete is logged in
+        return redirect(url_for('login'))
 
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
     if not athlete:
-        return redirect(url_for('login'))  # Handle non-existent athlete
+        return redirect(url_for('login'))
 
     # Fetch all athletes, training plans, and competitions
-    athletes = Athlete.query.all()  # All athletes
-    plans = TrainingPlan.query.all()  # All training plans
-    competitions = Competition.query.all()  # All competitions
-
-    # Debugging output for verification
-    print(f"Athletes: {athletes}")
-    print(f"Plans: {plans}")
-    print(f"Competitions: {competitions}")
+    athletes = Athlete.query.all()
+    plans = TrainingPlan.query.all()
+    competitions = Competition.query.all()
 
     return render_template('dashboard.html', athletes=athletes, plans=plans, competitions=competitions)
 
@@ -102,7 +99,7 @@ def dashboard():
 # Admin Dashboard Route
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if session.get('role') != 'admin':  # Ensure you're checking for 'admin' in lowercase
+    if session.get('role') != 'admin':
         flash("Access denied.", "error")
         return redirect(url_for('login'))
     return render_template('admin_dashboard.html')
@@ -117,7 +114,7 @@ def guest_view():
 @app.route('/guest_register', methods=['POST'])
 def guest_register():
     try:
-        new_user = User(user_id=f"guest-{int(datetime.datetime.now().timestamp())}", role="Guest")
+        new_user = User(user_id=f"guest-{int(datetime.datetime.now().timestamp())}", role="guest")
         db.session.add(new_user)
         db.session.commit()
         flash("Guest registration successful!", "success")
