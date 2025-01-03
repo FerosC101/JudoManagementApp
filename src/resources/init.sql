@@ -72,6 +72,10 @@ ALTER COLUMN user_id TYPE TEXT;
 ALTER TABLE training_plans
 ADD COLUMN session_per_week INT;
 
+ALTER TABLE payments
+ADD COLUMN plan_type VARCHAR(10),
+ADD CONSTRAINT check_plan_type CHECK (plan_type IN ('monthly', 'weekly', 'private'));
+
 -- Insert Training Plans
 INSERT INTO training_plans (plan_name, description, monthly_fee, weekly_fee, private_hourly_fee, category, session_per_week)
 VALUES

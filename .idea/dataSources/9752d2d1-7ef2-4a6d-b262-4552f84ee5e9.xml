@@ -3,15 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.53">
     <root id="1">
       <DateStyle>mdy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G</Grants>
-      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1239</IntrospectionStateNumber>
       <ServerVersion>16.4</ServerVersion>
       <StartupTime>1735870569</StartupTime>
       <TimeZones>true ACDT
@@ -815,7 +807,7 @@ false Zulu
 14698||10|C|G
 14698||-9223372036854775808|U|G
 14698||10|U|G</Grants>
-      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1239</IntrospectionStateNumber>
       <ObjectId>65685</ObjectId>
       <OwnerName>vince</OwnerName>
     </database>
@@ -5936,8 +5928,8 @@ false Zulu
     <schema id="267" parent="4" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2025-01-03.14:03:19</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>1239</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2025-01-03.16:06:57</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -6027,7 +6019,7 @@ false Zulu
     </table>
     <table id="280" parent="267" name="payments">
       <ObjectId>114864</ObjectId>
-      <StateNumber>1221</StateNumber>
+      <StateNumber>1238</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vince</OwnerName>
     </table>
@@ -6288,7 +6280,13 @@ false Zulu
       <StateNumber>1220</StateNumber>
       <UnderlyingIndexId>114861</UnderlyingIndexId>
     </key>
-    <column id="315" parent="280" name="payment_id">
+    <check id="315" parent="280" name="check_plan_type">
+      <ColNames>plan_type</ColNames>
+      <ObjectId>123029</ObjectId>
+      <Predicate>(plan_type)::text = ANY ((ARRAY[&apos;monthly&apos;::character varying, &apos;weekly&apos;::character varying, &apos;private&apos;::character varying])::text[])</Predicate>
+      <StateNumber>1238</StateNumber>
+    </check>
+    <column id="316" parent="280" name="payment_id">
       <DefaultExpression>nextval(&apos;payments_payment_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -6297,28 +6295,28 @@ false Zulu
       <SequenceId>114863</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="316" parent="280" name="athlete_id">
+    <column id="317" parent="280" name="athlete_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1221</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="317" parent="280" name="training_plan_id">
+    <column id="318" parent="280" name="training_plan_id">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>1221</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="318" parent="280" name="amount">
+    <column id="319" parent="280" name="amount">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1221</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="319" parent="280" name="payment_date">
+    <column id="320" parent="280" name="payment_date">
       <DefaultExpression>CURRENT_DATE</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
@@ -6326,14 +6324,20 @@ false Zulu
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="320" parent="280" name="payment_method">
+    <column id="321" parent="280" name="payment_method">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>1221</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <foreign-key id="321" parent="280" name="payments_athlete_id_fkey">
+    <column id="322" parent="280" name="plan_type">
+      <Position>7</Position>
+      <StateNumber>1238</StateNumber>
+      <StoredType>varchar(10)|0s</StoredType>
+      <TypeId>1043</TypeId>
+    </column>
+    <foreign-key id="323" parent="280" name="payments_athlete_id_fkey">
       <ColNames>athlete_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114873</ObjectId>
@@ -6342,7 +6346,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>114837</RefTableId>
     </foreign-key>
-    <foreign-key id="322" parent="280" name="payments_training_plan_id_fkey">
+    <foreign-key id="324" parent="280" name="payments_training_plan_id_fkey">
       <ColNames>training_plan_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114878</ObjectId>
@@ -6351,7 +6355,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>114845</RefTableId>
     </foreign-key>
-    <index id="323" parent="280" name="payments_pkey">
+    <index id="325" parent="280" name="payments_pkey">
       <ColNames>payment_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114871</ObjectId>
@@ -6360,20 +6364,20 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="324" parent="280" name="payments_pkey">
+    <key id="326" parent="280" name="payments_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114872</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1221</StateNumber>
       <UnderlyingIndexId>114871</UnderlyingIndexId>
     </key>
-    <check id="325" parent="281" name="training_plans_category_check">
+    <check id="327" parent="281" name="training_plans_category_check">
       <ColNames>category</ColNames>
       <ObjectId>114849</ObjectId>
       <Predicate>category = ANY (ARRAY[&apos;Beginner&apos;::text, &apos;Intermediate&apos;::text, &apos;Elite&apos;::text])</Predicate>
       <StateNumber>1219</StateNumber>
     </check>
-    <column id="326" parent="281" name="training_plan_id">
+    <column id="328" parent="281" name="training_plan_id">
       <DefaultExpression>nextval(&apos;training_plans_training_plan_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -6382,52 +6386,52 @@ false Zulu
       <SequenceId>114844</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="327" parent="281" name="plan_name">
+    <column id="329" parent="281" name="plan_name">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="328" parent="281" name="description">
+    <column id="330" parent="281" name="description">
       <Position>3</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="329" parent="281" name="monthly_fee">
+    <column id="331" parent="281" name="monthly_fee">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="330" parent="281" name="weekly_fee">
+    <column id="332" parent="281" name="weekly_fee">
       <Position>5</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="331" parent="281" name="private_hourly_fee">
+    <column id="333" parent="281" name="private_hourly_fee">
       <Position>6</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="332" parent="281" name="category">
+    <column id="334" parent="281" name="category">
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>1219</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="333" parent="281" name="session_per_week">
+    <column id="335" parent="281" name="session_per_week">
       <Position>8</Position>
       <StateNumber>1230</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <index id="334" parent="281" name="training_plans_pkey">
+    <index id="336" parent="281" name="training_plans_pkey">
       <ColNames>training_plan_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114852</ObjectId>
@@ -6436,40 +6440,40 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="335" parent="281" name="training_plans_pkey">
+    <key id="337" parent="281" name="training_plans_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114853</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1219</StateNumber>
       <UnderlyingIndexId>114852</UnderlyingIndexId>
     </key>
-    <check id="336" parent="282" name="users_role_check">
+    <check id="338" parent="282" name="users_role_check">
       <ColNames>role</ColNames>
       <ObjectId>114886</ObjectId>
       <Predicate>role = ANY (ARRAY[&apos;athlete&apos;::text, &apos;guest&apos;::text])</Predicate>
       <StateNumber>1222</StateNumber>
     </check>
-    <column id="337" parent="282" name="user_id">
+    <column id="339" parent="282" name="user_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="338" parent="282" name="role">
+    <column id="340" parent="282" name="role">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="339" parent="282" name="athlete_id">
+    <column id="341" parent="282" name="athlete_id">
       <Position>3</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <foreign-key id="340" parent="282" name="users_athlete_id_fkey">
+    <foreign-key id="342" parent="282" name="users_athlete_id_fkey">
       <ColNames>athlete_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114893</ObjectId>
@@ -6478,7 +6482,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>114837</RefTableId>
     </foreign-key>
-    <index id="341" parent="282" name="users_pkey">
+    <index id="343" parent="282" name="users_pkey">
       <ColNames>user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114889</ObjectId>
@@ -6490,7 +6494,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="342" parent="282" name="users_athlete_id_key">
+    <index id="344" parent="282" name="users_athlete_id_key">
       <ColNames>athlete_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114891</ObjectId>
@@ -6501,14 +6505,14 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="343" parent="282" name="users_pkey">
+    <key id="345" parent="282" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114890</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1222</StateNumber>
       <UnderlyingIndexId>114889</UnderlyingIndexId>
     </key>
-    <key id="344" parent="282" name="users_athlete_id_key">
+    <key id="346" parent="282" name="users_athlete_id_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114892</ObjectId>
       <StateNumber>1222</StateNumber>

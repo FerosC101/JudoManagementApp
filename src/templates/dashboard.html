@@ -24,7 +24,7 @@
 
         .navbar h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 3.5rem; /* Increased size */
             color: #ffca28;
         }
 
@@ -34,7 +34,7 @@
 
         .menu-icon {
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 2rem; /* Increased size */
             color: #ffca28;
         }
 
@@ -68,9 +68,7 @@
 
         .section {
             margin: 30px;
-            padding: 20px;
-            background: #3c3c3c;
-            border-radius: 10px;
+            padding: 0; /* Removed padding around sections */
         }
 
         .section h2 {
@@ -91,7 +89,7 @@
             width: 220px;
             height: 180px;
             background: #3c3c3c;
-            border: 1px solid #5a5a5a;
+            border: none; /* Removed border */
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -197,6 +195,75 @@
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('modal').style.display = 'none';
         }
+
+        function showPaymentOptions() {
+            const paymentDiv = document.getElementById('payment-method');
+            paymentDiv.style.display = paymentDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        let selectedPlan = null;
+        let planFees = {};
+
+        function showSessionSelection(planName, monthlyFee, weeklyFee, privateFee) {
+            console.log(planName, monthlyFee, weeklyFee, privateFee);
+            selectedPlan = planName;
+            planFees = { monthly: monthlyFee, weekly: weeklyFee, private: privateFee };
+            document.getElementById('session-selection').style.display = 'block';
+        }
+
+        function closeSessionModal() {
+            document.getElementById('session-selection').style.display = 'none';
+        }
+
+        function submitSession() {
+            const sessionType = document.querySelector('input[name="session_type"]:checked');
+
+            if (!sessionType) {
+                alert('Please select a session type.');
+                return;
+            }
+
+            const selectedSession = sessionType.value;
+            const fee = planFees[selectedSession];
+
+            // Show payment method after session selection
+            document.getElementById('session-selection').style.display = 'none';
+            showPaymentOptions();
+        }
+
+        function submitPaymentMethod() {
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+
+            if (!paymentMethod) {
+                alert('Please select a payment method.');
+                return;
+            }
+
+            const method = paymentMethod.value;
+
+            // Make a POST request to save the payment details to the database
+            fetch('/register_plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    plan_name: selectedPlan,
+                    session_type: sessionType,
+                    fee: planFees[selectedSession],
+                    payment_method: method
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`You have registered for the ${selectedSession} session for ${selectedPlan} using ${method}.`);
+                    closeModal();  // Close the modal after submission
+                } else {
+                    alert('There was an issue processing the payment. Please try again.');
+                }
+            });
+        }
     </script>
 </head>
 <body>
@@ -205,9 +272,15 @@
         <div class="menu">
             <span class="menu-icon">☰</span>
             <div class="dropdown">
-                <a href="#">Profile</a>
+                <a href="#" onclick="showDetails('Profile', `
+                    <strong>Name:</strong> {{ athlete.name }}<br>
+                    <strong>Age:</strong> {{ athlete.age }}<br>
+                    <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
+                    <strong>Category:</strong> {{ athlete.weight_category }}<br>
+                    <strong>Athlete ID:</strong> {{ athlete.athlete_id }}
+                `);">Profile</a>
                 <a href="#">Payments</a>
-                <a href="#">Logout</a>
+                <a href="{{ url_for('login') }}">Logout</a>
             </div>
         </div>
     </div>
@@ -224,12 +297,7 @@
                     <br>
                     <strong>Training Plans:</strong><br>
                         {% for plan in athlete.plans %}
-                        - {{ plan }}<br>
-                        {% endfor %}
-                    <br>
-                    <strong>Competitions:</strong><br>
-                        {% for competition in athlete.competitions %}
-                        - {{ competition }}<br>
+                            {{ plan.plan_name }}<br>
                         {% endfor %}
                 `)">
                     {{ athlete.name[0] }}
@@ -240,20 +308,20 @@
 
     <!-- Training Plans Section -->
     <div class="section" id="plans">
-        <h2>Training Plans</h2>
+        <h2>Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
-            <div class="card" onclick="showDetails('Training Plan: {{ plan.plan_name }}', `
-                <strong>Description:</strong> {{ plan.description }}<br>
-                <strong>Monthly Fee:</strong> {{ plan.monthly_fee }}<br>
-                <strong>Weekly Fee:</strong> {{ plan.weekly_fee }}<br>
-                <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
-                <strong>Category:</strong> {{ plan.category }}<br>
-                <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
-                <button class='modal-close'>Register</button>
-            `)">
-                {{ plan.plan_name[0] }}
-            </div>
+                <div class="card" onclick="showDetails('{{ plan.plan_name }}', `
+                    <strong>description:</strong> {{ plan.description }}<br>
+                    <strong>Fee:</strong> {{ plan.monthly_fee }}<br>
+                    <strong>Weekly Fee:</strong> {{ plan.weekly_fee }}<br>
+                    <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
+                    <strong>Category:</strong> {{ plan.category }}<br>
+                    <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
+                    <button class='modal-close' onclick='showSessionSelection(event)'>Register</button>
+                `)">
+                    {{ plan.plan_name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -266,9 +334,9 @@
             <div class="card" onclick="showDetails('Competition: {{ competition.competition_name }}', `
                 <strong>Location:</strong> {{ competition.location }}<br>
                 <strong>Date:</strong> {{ competition.date }}<br>
-                <strong>Weight Category:</strong> {{ competition.weight_category }}<br>
-                <strong>Entry Fee:</strong> {{ competition.entry_fee }}<br>
-                <button class='modal-close'>Register</button>
+                <strong>Competition Fee:</strong> {{ competition.entry_fee }}<br>
+                <strong>Category:</strong> {{ competition.weight_category }}<br>
+                <button class='modal-close' onclick='showPaymentOptions(event)'>Register</button>
             `)">
                 {{ competition.competition_name[0] }}
             </div>
@@ -276,11 +344,48 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
-    <div class="modal" id="modal">
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
+
+    <!-- Training Plan Modal -->
+    <div id="modal" class="modal">
         <div class="modal-header" id="modal-title"></div>
         <div class="modal-content" id="modal-content"></div>
         <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+
+    <!-- Session Type Selection Modal -->
+    <div id="session-selection" class="modal" style="display:none;">
+        <div class="modal-header">Select Session Type</div>
+        <div class="modal-content">
+            <p>Choose your preferred session type:</p>
+            <form id="session-form">
+                <input type="radio" id="monthly" name="session_type" value="monthly">
+                <label for="monthly">Monthly</label><br>
+                <input type="radio" id="weekly" name="session_type" value="weekly">
+                <label for="weekly">Weekly</label><br>
+                <input type="radio" id="private" name="session_type" value="private">
+                <label for="private">Private Session</label><br>
+            </form>
+            <button class="modal-close" onclick="submitSession()">Confirm</button>
+            <button class="modal-close" onclick="closeSessionModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div id="payment-method" class="modal" style="display:none;">
+        <div class="modal-header">Select Payment Method</div>
+        <div class="modal-content">
+            <form id="payment-form">
+                <input type="radio" id="credit" name="payment_method" value="credit">
+                <label for="credit">Credit Card</label><br>
+                <input type="radio" id="paypal" name="payment_method" value="paypal">
+                <label for="paypal">PayPal</label><br>
+                <input type="radio" id="bank" name="payment_method" value="bank">
+                <label for="bank">Bank Transfer</label><br>
+            </form>
+            <button class="modal-close" onclick="submitPaymentMethod()">Confirm Payment</button>
+        </div>
     </div>
 </body>
 </html>

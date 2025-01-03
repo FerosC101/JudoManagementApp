@@ -1,5 +1,6 @@
 from src.extension import db
 from datetime import datetime
+from sqlalchemy import Enum
 
 ## Athlete Model
 class Athlete(db.Model):
@@ -61,9 +62,11 @@ class Payment(db.Model):
     amount = db.Column(db.Float, nullable=False)
     payment_date = db.Column(db.Date, default=datetime.utcnow, nullable=False)
     payment_method = db.Column(db.String(20), nullable=False)
+    plan_type = db.Column(Enum('monthly', 'weekly', 'private', name='plan_type_enum'), nullable=False)
 
     # Backref for reverse relationship
     training_plan = db.relationship('TrainingPlan', backref='payments', lazy=True)
+    athlete = db.relationship('Athlete', backref='payments', lazy=True)
 
 
 # Users Model
