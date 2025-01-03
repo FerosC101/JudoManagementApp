@@ -32,6 +32,7 @@ class TrainingPlan(db.Model):
     weekly_fee = db.Column(db.Float, nullable=True)  # Added weekly fee
     private_hourly_fee = db.Column(db.Float, nullable=True)  # Added private hourly fee
     category = db.Column(db.String(20), nullable=False)  # Added category field with values Beginner, Intermediate, Elite
+    session_per_week = db.Column(db.Integer, nullable=True)
 
     # Updated backref for reverse relationship to avoid conflict
     athlete_assignments = db.relationship('AthleteTraining', backref='training_plan_for_athlete', lazy=True)

@@ -11,9 +11,9 @@
 4||10|c|G
 4||10|C|G
 4||10|T|G</Grants>
-      <IntrospectionStateNumber>1225</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
       <ServerVersion>16.4</ServerVersion>
-      <StartupTime>1735785731</StartupTime>
+      <StartupTime>1735870569</StartupTime>
       <TimeZones>true ACDT
 true ACSST
 false ACST
@@ -815,7 +815,7 @@ false Zulu
 14698||10|C|G
 14698||-9223372036854775808|U|G
 14698||10|U|G</Grants>
-      <IntrospectionStateNumber>1225</IntrospectionStateNumber>
+      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
       <ObjectId>65685</ObjectId>
       <OwnerName>vince</OwnerName>
     </database>
@@ -5936,8 +5936,8 @@ false Zulu
     <schema id="267" parent="4" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>1225</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2025-01-02.13:09:31</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>1231</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2025-01-03.14:03:19</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>524</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -6033,7 +6033,7 @@ false Zulu
     </table>
     <table id="281" parent="267" name="training_plans">
       <ObjectId>114845</ObjectId>
-      <StateNumber>1221</StateNumber>
+      <StateNumber>1230</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vince</OwnerName>
     </table>
@@ -6421,7 +6421,13 @@ false Zulu
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <index id="333" parent="281" name="training_plans_pkey">
+    <column id="333" parent="281" name="session_per_week">
+      <Position>8</Position>
+      <StateNumber>1230</StateNumber>
+      <StoredType>integer|0s</StoredType>
+      <TypeId>23</TypeId>
+    </column>
+    <index id="334" parent="281" name="training_plans_pkey">
       <ColNames>training_plan_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114852</ObjectId>
@@ -6430,40 +6436,40 @@ false Zulu
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="334" parent="281" name="training_plans_pkey">
+    <key id="335" parent="281" name="training_plans_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114853</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1219</StateNumber>
       <UnderlyingIndexId>114852</UnderlyingIndexId>
     </key>
-    <check id="335" parent="282" name="users_role_check">
+    <check id="336" parent="282" name="users_role_check">
       <ColNames>role</ColNames>
       <ObjectId>114886</ObjectId>
       <Predicate>role = ANY (ARRAY[&apos;athlete&apos;::text, &apos;guest&apos;::text])</Predicate>
       <StateNumber>1222</StateNumber>
     </check>
-    <column id="336" parent="282" name="user_id">
+    <column id="337" parent="282" name="user_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="337" parent="282" name="role">
+    <column id="338" parent="282" name="role">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="338" parent="282" name="athlete_id">
+    <column id="339" parent="282" name="athlete_id">
       <Position>3</Position>
       <StateNumber>1222</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <foreign-key id="339" parent="282" name="users_athlete_id_fkey">
+    <foreign-key id="340" parent="282" name="users_athlete_id_fkey">
       <ColNames>athlete_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114893</ObjectId>
@@ -6472,7 +6478,7 @@ false Zulu
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>114837</RefTableId>
     </foreign-key>
-    <index id="340" parent="282" name="users_pkey">
+    <index id="341" parent="282" name="users_pkey">
       <ColNames>user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114889</ObjectId>
@@ -6484,7 +6490,7 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <index id="341" parent="282" name="users_athlete_id_key">
+    <index id="342" parent="282" name="users_athlete_id_key">
       <ColNames>athlete_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114891</ObjectId>
@@ -6495,14 +6501,14 @@ false Zulu
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="342" parent="282" name="users_pkey">
+    <key id="343" parent="282" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114890</ObjectId>
       <Primary>1</Primary>
       <StateNumber>1222</StateNumber>
       <UnderlyingIndexId>114889</UnderlyingIndexId>
     </key>
-    <key id="343" parent="282" name="users_athlete_id_key">
+    <key id="344" parent="282" name="users_athlete_id_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>114892</ObjectId>
       <StateNumber>1222</StateNumber>

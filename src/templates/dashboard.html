@@ -28,27 +28,68 @@
             color: #ffca28;
         }
 
+        .menu {
+            position: relative;
+        }
+
+        .menu-icon {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ffca28;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #3c3c3c;
+            border: 1px solid #5a5a5a;
+            border-radius: 5px;
+            margin-top: 10px;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        .dropdown a {
+            display: block;
+            text-decoration: none;
+            color: #f5f5dc;
+            padding: 5px;
+        }
+
+        .dropdown a:hover {
+            background: #ffca28;
+            color: #2c2c2c;
+        }
+
+        .menu:hover .dropdown {
+            display: block;
+        }
+
         .section {
-            margin: 20px;
+            margin: 30px;
+            padding: 20px;
+            background: #3c3c3c;
+            border-radius: 10px;
         }
 
         .section h2 {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
             color: #ffca28;
         }
 
         .scroll-container {
             display: flex;
-            gap: 10px;
+            gap: 20px;
             overflow-x: auto;
             padding: 10px 0;
         }
 
         .card {
             flex: 0 0 auto;
-            width: 150px;
-            height: 120px;
+            width: 220px;
+            height: 180px;
             background: #3c3c3c;
             border: 1px solid #5a5a5a;
             border-radius: 8px;
@@ -90,22 +131,29 @@
             padding: 20px;
             border-radius: 10px;
             max-width: 600px;
-            width: 80%;
+            width: 90%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             z-index: 1000;
         }
 
         .modal-header {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: #ffca28;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         .modal-content {
             font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .modal-content strong {
+            color: #ffca28;
         }
 
         .modal-close {
+            display: block;
             background: #ffca28;
             border: none;
             color: #2c2c2c;
@@ -113,7 +161,9 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 20px auto 0;
+            width: 150px;
+            text-align: center;
         }
 
         .modal-close:hover {
@@ -121,9 +171,24 @@
         }
     </style>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuIcon = document.querySelector('.menu-icon');
+            const dropdown = document.querySelector('.dropdown');
+
+            menuIcon.addEventListener('click', () => {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!menuIcon.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-content').innerText = content;
+            document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-overlay').style.display = 'block';
             document.getElementById('modal').style.display = 'block';
         }
@@ -137,6 +202,14 @@
 <body>
     <div class="navbar">
         <h1>Judo</h1>
+        <div class="menu">
+            <span class="menu-icon">☰</span>
+            <div class="dropdown">
+                <a href="#">Profile</a>
+                <a href="#">Payments</a>
+                <a href="#">Logout</a>
+            </div>
+        </div>
     </div>
 
     <!-- Athletes Section -->
@@ -144,20 +217,42 @@
         <h2>Athletes</h2>
         <div class="scroll-container">
             {% for athlete in athletes %}
-            <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}', 'ID: {{ athlete.athlete_id }} | Age: {{ athlete.age }} | Weight: {{ athlete.current_weight }} kg | Category: {{ athlete.weight_category }}')">
-                A
-            </div>
+                <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}', `
+                    <strong>Age:</strong> {{ athlete.age }}<br>
+                    <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
+                    <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>
+                    <br>
+                    <strong>Training Plans:</strong><br>
+                        {% for plan in athlete.plans %}
+                        - {{ plan }}<br>
+                        {% endfor %}
+                    <br>
+                    <strong>Competitions:</strong><br>
+                        {% for competition in athlete.competitions %}
+                        - {{ competition }}<br>
+                        {% endfor %}
+                `)">
+                    {{ athlete.name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Plans Section -->
+    <!-- Training Plans Section -->
     <div class="section" id="plans">
-        <h2>Plans</h2>
+        <h2>Training Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
-            <div class="card" onclick="showDetails('Plan: {{ plan.title }}', 'Description: {{ plan.description }} | Start: {{ plan.start_date }} | End: {{ plan.end_date }}')">
-                P
+            <div class="card" onclick="showDetails('Training Plan: {{ plan.plan_name }}', `
+                <strong>Description:</strong> {{ plan.description }}<br>
+                <strong>Monthly Fee:</strong> {{ plan.monthly_fee }}<br>
+                <strong>Weekly Fee:</strong> {{ plan.weekly_fee }}<br>
+                <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
+                <strong>Category:</strong> {{ plan.category }}<br>
+                <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
+                <button class='modal-close'>Register</button>
+            `)">
+                {{ plan.plan_name[0] }}
             </div>
             {% endfor %}
         </div>
@@ -168,14 +263,19 @@
         <h2>Competitions</h2>
         <div class="scroll-container">
             {% for competition in competitions %}
-            <div class="card" onclick="showDetails('Competition: {{ competition.name }}', 'Location: {{ competition.location }} | Date: {{ competition.date }} | Participants: {{ competition.participants }}')">
-                C
+            <div class="card" onclick="showDetails('Competition: {{ competition.competition_name }}', `
+                <strong>Location:</strong> {{ competition.location }}<br>
+                <strong>Date:</strong> {{ competition.date }}<br>
+                <strong>Weight Category:</strong> {{ competition.weight_category }}<br>
+                <strong>Entry Fee:</strong> {{ competition.entry_fee }}<br>
+                <button class='modal-close'>Register</button>
+            `)">
+                {{ competition.competition_name[0] }}
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Modal -->
     <div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
     <div class="modal" id="modal">
         <div class="modal-header" id="modal-title"></div>

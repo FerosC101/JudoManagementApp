@@ -69,39 +69,53 @@ CREATE TABLE users (
 ALTER TABLE users
 ALTER COLUMN user_id TYPE TEXT;
 
-INSERT INTO athletes (athlete_id, name, age, current_weight, weight_category)
-VALUES
-    ('24-0005', 'Anjo Santos', 22, 70.5, 'Lightweight'),
-    ('24-0006', 'Kiarra Gomez', 20, 60.0, 'Featherweight'),
-    ('24-0007', 'Lenard Cruz', 25, 90.2, 'Middleweight');
+ALTER TABLE training_plans
+ADD COLUMN session_per_week INT;
 
-INSERT INTO users (user_id, role, athlete_id)
+-- Insert Training Plans
+INSERT INTO training_plans (plan_name, description, monthly_fee, weekly_fee, private_hourly_fee, category, session_per_week)
 VALUES
-    ('u-1001', 'athlete', '24-0005'),
-    ('u-1002', 'athlete', '24-0006'),
-    ('u-1003', 'athlete', '24-0007');
-INSERT INTO training_plans (plan_name, description, monthly_fee)
+    ('Beginner Judo',
+     'Introduction to judo fundamentals, including basic techniques and movements.',
+     1000.00,
+     1000.00 / 4,
+     500.00,
+     'Beginner',
+     3),
+
+    ('Intermediate Judo',
+     'For judokas who have mastered the basics and are ready for intermediate throws and groundwork techniques.',
+     2000.00,
+     2000.00 / 4,
+     700.00,
+     'Intermediate',
+     4),
+
+    ('Advanced Competition Prep',
+     'Focused on competition techniques, conditioning, and strategy for elite athletes.',
+     5000.00,
+     5000.00 / 4,
+     1200.00,
+     'Elite',
+     5);
+
+-- Insert Competitions
+INSERT INTO competitions (competition_name, location, date, weight_category, entry_fee)
 VALUES
-    ('Basic Judo Training', 'A beginner-friendly plan for mastering fundamental judo techniques.', 150.0),
-    ('Advanced Grappling', 'Focused on advanced grappling and throwing techniques for competition.', 200.0),
-    ('Competition Prep', 'Intensive plan for preparing for upcoming judo competitions.', 180.0);
-INSERT INTO athlete_training (athlete_id, training_plan_id, start_date, end_date)
-VALUES
-    ('24-0005', 1, '2025-01-01', '2025-03-01'),
-    ('24-0006', 2, '2025-01-10', '2025-02-10'), -- Ongoing plan
-    ('24-0007', 3, '2025-01-15', '2025-02-28');
-INSERT INTO competitions (competition_name, date, location)
-VALUES
-    ('Winter Judo Championship', '2025-02-10', 'London'),
-    ('Spring Judo Open', '2025-03-15', 'Manchester'),
-    ('National Judo Finals', '2025-04-20', 'Birmingham');
-INSERT INTO athlete_competitions (athlete_id, competition_id, registration_date)
-VALUES
-    ('24-0005', 1, '2024-12-30'),
-    ('24-0006', 3, '2024-12-31'),
-    ('24-0007', 2, '2024-12-28');
-INSERT INTO payments (athlete_id, training_plan_id, amount, payment_date, payment_method)
-VALUES
-    ('24-0005', 1, 150.0, '2025-01-05', 'Credit Card'),
-    ('24-0006', 2, 200.0, '2025-01-12', 'PayPal'),
-    ('24-0007', 3, 180.0, '2025-01-20', 'Bank Transfer');
+    ('City Judo Championship',
+     'Batangas City Sports Center',
+     '2025-02-15',
+     'Under 60kg',
+     500.00),
+
+    ('Southern Luzon Regional Judo Meet',
+     'Calamba Coliseum',
+     '2025-03-10',
+     'Under 75kg',
+     800.00),
+
+    ('Philippine National Judo Cup',
+     'Manila Arena',
+     '2025-05-20',
+     'Open Weight',
+     1500.00);
