@@ -108,20 +108,21 @@ def dashboard():
 def register_plan():
     # Get the data from the request
     data = request.get_json()
-    athlete_id = data.get('athlete_id')  # Athlete's ID, passed from frontend
-    plan_name = data.get('plan_name')  # Plan name (e.g., 'Plan A')
+    athlete_id = data.get('athlete_id')  # Athlete's ID, passed from the frontend
+    plan_name = data.get('plan_name')  # Plan name (e.g., 'Monthly Plan', 'Weekly Plan', 'Private Plan')
     session_type = data.get('session_type')  # e.g., 'monthly', 'weekly', 'private'
-    fee = data.get('fee')  # Plan fee
     payment_method = data.get('payment_method')  # Payment method (e.g., 'credit', 'paypal', etc.)
 
-    # Assume the plan name is linked to a valid training plan in your system.
-    # You may need to query the `TrainingPlan` model to get the training plan ID.
-    training_plan = TrainingPlan.query.filter_by(plan_name=plan_name).first()
+    # Validate input data
+    if not athlete_id or not plan_name or not session_type or not payment_method:
+        return jsonify({"success": False, "message": "All fields are required."})
 
+    # Fetch the training plan by name
+    training_plan = TrainingPlan.query.filter_by(plan_name=plan_name).first()
     if not training_plan:
         return jsonify({"success": False, "message": "Training plan not found."})
 
-    # Calculate the amount based on the session type (or use `fee` directly)
+    # Calculate the amount based on the session type
     if session_type == 'monthly':
         amount = training_plan.monthly_fee
     elif session_type == 'weekly':
@@ -131,32 +132,34 @@ def register_plan():
     else:
         return jsonify({"success": False, "message": "Invalid session type."})
 
-    # Create a new Payment record
-    new_payment = Payment(
-        athlete_id=athlete_id,
-        training_plan_id=training_plan.training_plan_id,
-        amount=amount,
-        payment_method=payment_method,
-        plan_type=session_type
-    )
+    try:
+        # Create a new Payment record
+        new_payment = Payment(
+            athlete_id=athlete_id,
+            training_plan_id=training_plan.training_plan_id,
+            amount=amount,
+            payment_method=payment_method,
+            plan_type=session_type
+        )
+        db.session.add(new_payment)
 
-    # Commit the payment to the database
-    db.session.add(new_payment)
-    db.session.commit()
+        # Create an AthleteTraining record to track the athlete's registration to the plan
+        new_training = AthleteTraining(
+            athlete_id=athlete_id,
+            training_plan_id=training_plan.training_plan_id,
+            start_date=datetime.datetime.utcnow(),  # Current date as the start date
+            end_date=None  # Assuming this is an ongoing training session
+        )
+        db.session.add(new_training)
 
-    # Create an AthleteTraining record to track which athlete is registered to the plan
-    new_training = AthleteTraining(
-        athlete_id=athlete_id,
-        training_plan_id=training_plan.training_plan_id,
-        start_date=datetime.utcnow(),  # Set current date as the start date
-        end_date=None  # Assuming this is an ongoing training session (end date to be added later)
-    )
+        # Commit both Payment and AthleteTraining to the database
+        db.session.commit()
 
-    # Commit the athlete training record to the database
-    db.session.add(new_training)
-    db.session.commit()
-
-    return jsonify({"success": True, "message": "Successfully registered for the plan!"})
+        return jsonify({"success": True, "message": "Successfully registered for the plan and payment recorded!"})
+    except Exception as e:
+        # Rollback the transaction in case of an error
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error: {str(e)}"})
 
 # Admin Dashboard Route
 @app.route('/admin_dashboard')

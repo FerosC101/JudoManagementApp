@@ -24,7 +24,7 @@
 
         .navbar h1 {
             margin: 0;
-            font-size: 3.5rem; /* Increased size */
+            font-size: 3.5rem;
             color: #ffca28;
         }
 
@@ -34,7 +34,7 @@
 
         .menu-icon {
             cursor: pointer;
-            font-size: 2rem; /* Increased size */
+            font-size: 2rem;
             color: #ffca28;
         }
 
@@ -68,7 +68,7 @@
 
         .section {
             margin: 30px;
-            padding: 0; /* Removed padding around sections */
+            padding: 0;
         }
 
         .section h2 {
@@ -89,7 +89,7 @@
             width: 220px;
             height: 180px;
             background: #3c3c3c;
-            border: none; /* Removed border */
+            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -167,6 +167,10 @@
         .modal-close:hover {
             background: #d4a019;
         }
+
+        .payment-method label {
+            font-size: 1.2rem;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -184,6 +188,9 @@
             });
         });
 
+        let selectedPlan = null;
+        let planFees = {};
+
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
@@ -196,16 +203,7 @@
             document.getElementById('modal').style.display = 'none';
         }
 
-        function showPaymentOptions() {
-            const paymentDiv = document.getElementById('payment-method');
-            paymentDiv.style.display = paymentDiv.style.display === 'none' ? 'block' : 'none';
-        }
-
-        let selectedPlan = null;
-        let planFees = {};
-
         function showSessionSelection(planName, monthlyFee, weeklyFee, privateFee) {
-            console.log(planName, monthlyFee, weeklyFee, privateFee);
             selectedPlan = planName;
             planFees = { monthly: monthlyFee, weekly: weeklyFee, private: privateFee };
             document.getElementById('session-selection').style.display = 'block';
@@ -226,9 +224,13 @@
             const selectedSession = sessionType.value;
             const fee = planFees[selectedSession];
 
-            // Show payment method after session selection
             document.getElementById('session-selection').style.display = 'none';
             showPaymentOptions();
+        }
+
+        function showPaymentOptions() {
+            const paymentDiv = document.getElementById('payment-method');
+            paymentDiv.style.display = paymentDiv.style.display === 'none' ? 'block' : 'none';
         }
 
         function submitPaymentMethod() {
@@ -240,29 +242,51 @@
             }
 
             const method = paymentMethod.value;
+            document.getElementById('payment-method').style.display = 'none';
 
-            // Make a POST request to save the payment details to the database
-            fetch('/register_plan', {
+            if (method === 'credit') {
+                document.getElementById('credit-details').style.display = 'block';
+                document.getElementById('paypal-details').style.display = 'none';
+                document.getElementById('bank-details').style.display = 'none';
+            } else if (method === 'paypal') {
+                document.getElementById('credit-details').style.display = 'none';
+                document.getElementById('paypal-details').style.display = 'block';
+                document.getElementById('bank-details').style.display = 'none';
+            } else if (method === 'bank') {
+                document.getElementById('credit-details').style.display = 'none';
+                document.getElementById('paypal-details').style.display = 'none';
+                document.getElementById('bank-details').style.display = 'block';
+            }
+
+            document.getElementById('payment-details').style.display = 'block';
+        }
+
+        function submitPaymentDetails() {
+            const formData = new FormData(document.getElementById('payment-details-form'));
+            const paymentData = Object.fromEntries(formData);
+
+            fetch('/add_payment', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    plan_name: selectedPlan,
-                    session_type: sessionType,
-                    fee: planFees[selectedSession],
-                    payment_method: method
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData),
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`You have registered for the ${selectedSession} session for ${selectedPlan} using ${method}.`);
-                    closeModal();  // Close the modal after submission
+                    alert('Payment details saved successfully!');
+                    closePaymentDetails();
                 } else {
-                    alert('There was an issue processing the payment. Please try again.');
+                    alert('Failed to save payment details. Please try again.');
                 }
+            })
+            .catch(error => {
+                console.error('Error saving payment details:', error);
+                alert('An error occurred while saving payment details.');
             });
+        }
+
+        function closePaymentDetails() {
+            document.getElementById('payment-details').style.display = 'none';
         }
     </script>
 </head>
@@ -344,47 +368,60 @@
         </div>
     </div>
 
-    <!-- Modal Overlay -->
+    <!-- Modal for details -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
-
-    <!-- Training Plan Modal -->
     <div id="modal" class="modal">
         <div class="modal-header" id="modal-title"></div>
         <div class="modal-content" id="modal-content"></div>
         <button class="modal-close" onclick="closeModal()">Close</button>
     </div>
 
-    <!-- Session Type Selection Modal -->
-    <div id="session-selection" class="modal" style="display:none;">
-        <div class="modal-header">Select Session Type</div>
-        <div class="modal-content">
-            <p>Choose your preferred session type:</p>
-            <form id="session-form">
-                <input type="radio" id="monthly" name="session_type" value="monthly">
-                <label for="monthly">Monthly</label><br>
-                <input type="radio" id="weekly" name="session_type" value="weekly">
-                <label for="weekly">Weekly</label><br>
-                <input type="radio" id="private" name="session_type" value="private">
-                <label for="private">Private Session</label><br>
-            </form>
-            <button class="modal-close" onclick="submitSession()">Confirm</button>
-            <button class="modal-close" onclick="closeSessionModal()">Close</button>
-        </div>
+    <!-- Session selection modal -->
+    <div id="session-selection" class="modal">
+        <h3>Choose a Session Type</h3>
+        <label><input type="radio" name="session_type" value="monthly"> Monthly - $500</label><br>
+        <label><input type="radio" name="session_type" value="weekly"> Weekly - $300</label><br>
+        <label><input type="radio" name="session_type" value="private"> Private - $100</label><br>
+        <button class="modal-close" onclick="submitSession()">Submit</button>
+        <button class="modal-close" onclick="closeSessionModal()">Close</button>
     </div>
 
-    <!-- Payment Method Modal -->
+    <!-- Payment method modal -->
     <div id="payment-method" class="modal" style="display:none;">
-        <div class="modal-header">Select Payment Method</div>
-        <div class="modal-content">
-            <form id="payment-form">
-                <input type="radio" id="credit" name="payment_method" value="credit">
-                <label for="credit">Credit Card</label><br>
-                <input type="radio" id="paypal" name="payment_method" value="paypal">
-                <label for="paypal">PayPal</label><br>
-                <input type="radio" id="bank" name="payment_method" value="bank">
-                <label for="bank">Bank Transfer</label><br>
+        <h3>Select Payment Method</h3>
+        <label><input type="radio" name="payment_method" value="credit"> Credit Card</label><br>
+        <label><input type="radio" name="payment_method" value="paypal"> PayPal</label><br>
+        <label><input type="radio" name="payment_method" value="bank"> Bank Transfer</label><br>
+        <button class="modal-close" onclick="submitPaymentMethod()">Next</button>
+    </div>
+
+    <!-- Payment details modal -->
+    <div id="payment-details" class="modal" style="display:none;">
+        <h3>Enter Payment Details</h3>
+        <div id="credit-details" style="display:none;">
+            <form id="payment-details-form">
+                <label>Card Number:</label>
+                <input type="text" name="card_number"><br>
+                <label>Expiration Date:</label>
+                <input type="text" name="expiration_date"><br>
+                <label>CVV:</label>
+                <input type="text" name="cvv"><br>
+                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
             </form>
-            <button class="modal-close" onclick="submitPaymentMethod()">Confirm Payment</button>
+        </div>
+        <div id="paypal-details" style="display:none;">
+            <form id="payment-details-form">
+                <label>PayPal Email:</label>
+                <input type="email" name="paypal_email"><br>
+                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
+            </form>
+        </div>
+        <div id="bank-details" style="display:none;">
+            <form id="payment-details-form">
+                <label>Bank Account Number:</label>
+                <input type="text" name="bank_account"><br>
+                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
+            </form>
         </div>
     </div>
 </body>

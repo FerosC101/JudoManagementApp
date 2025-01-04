@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="Dashboard">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/9752d2d1-7ef2-4a6d-b262-4552f84ee5e9.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/9752d2d1-7ef2-4a6d-b262-4552f84ee5e9.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/9752d2d1-7ef2-4a6d-b262-4552f84ee5e9/storage_v2/_src_/database/judo_management.DDEBxg/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/9752d2d1-7ef2-4a6d-b262-4552f84ee5e9/storage_v2/_src_/database/judo_management.DDEBxg/schema/public.abK9xQ.meta" afterDir="false" />
+    <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="Dashboard : Plan Payment 56%">
+      <change afterPath="$PROJECT_DIR$/src/templates/payment_session.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/init.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/dashboard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -152,7 +149,8 @@
       <workItem from="1735824485201" duration="2439000" />
       <workItem from="1735870954233" duration="4038000" />
       <workItem from="1735889733580" duration="1849000" />
-      <workItem from="1735911481164" duration="10683000" />
+      <workItem from="1735911481164" duration="10773000" />
+      <workItem from="1735960575590" duration="2437000" />
     </task>
     <task id="LOCAL-00001" summary="c">
       <option name="closed" value="true" />
@@ -338,7 +336,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735914819924</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Dashboard : Plan Payment 56%">
+      <option name="closed" value="true" />
+      <created>1735923794953</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1735923794953</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,10 +368,11 @@
     <MESSAGE value="Debugging dashboard" />
     <MESSAGE value="updated database" />
     <MESSAGE value="Dashboard" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dashboard" />
+    <MESSAGE value="Dashboard : Plan Payment 56%" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dashboard : Plan Payment 56%" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1735923712500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1735961475596" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$.coverage" NAME=" Coverage Results" MODIFIED="1735569678349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$main.coverage" NAME="main Coverage Results" MODIFIED="1735569493845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$config.coverage" NAME="config Coverage Results" MODIFIED="1735007383187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
