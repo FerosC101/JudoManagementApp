@@ -1,0 +1,95 @@
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #2c2c2c; /* Deep Gray */
+            color: #f5f5dc; /* Cream */
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #3c3c3c; /* Slightly lighter deep gray */
+            color: #ffca28; /* Mustard Yellow */
+            border-bottom: 2px solid #1e40af; /* Ultramarine */
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #ffca28; /* Mustard Yellow */
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #3c3c3c; /* Slightly lighter deep gray */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #5a5a5a;
+        }
+        .form-container h2 {
+            text-align: center;
+            color: #ffca28; /* Mustard Yellow */
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2c; /* Deep Gray */
+            border: 1px solid #5a5a5a;
+            border-radius: 5px;
+            color: #f5f5dc; /* Cream */
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1e40af; /* Ultramarine */
+            box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
+        }
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background: #ffca28; /* Mustard Yellow */
+            border: none;
+            border-radius: 5px;
+            color: #2c2c2c; /* Deep Gray */
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .form-container button:hover {
+            background: #ffb300; /* Slightly darker mustard yellow */
+        }
+        .form-container .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #f5f5dc; /* Cream */
+            text-decoration: none;
+        }
+        .form-container .back-link:hover {
+            color: #1e40af; /* Ultramarine */
+        }
+        .notification {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .notification.success {
+            background: #28a745; /* Green */
+            color: white;
+        }
+        .notification.error {
+            background: #dc3545; /* Red */
+            color: white;
+        }

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Method and Details</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #2c2c2c; /* Deep Gray */
+            color: #f5f5dc; /* Cream */
+        }
+        .container {
+            width: 400px;
+            height: 400px; /* Fixed height for consistency */
+            margin: 50px auto;
+            background: #3c3c3c; /* Slightly lighter deep gray */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #5a5a5a;
+        }
+        h2 {
+            text-align: center;
+            color: #ffca28; /* Mustard Yellow */
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2c; /* Deep Gray */
+            border: 1px solid #5a5a5a;
+            border-radius: 5px;
+            color: #f5f5dc; /* Cream */
+            font-size: 1rem;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #1e40af; /* Ultramarine */
+            box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #ffca28; /* Mustard Yellow */
+            border: none;
+            border-radius: 5px;
+            color: #2c2c2c; /* Deep Gray */
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+        button:hover {
+            background: #ffb300; /* Slightly darker mustard yellow */
+        }
+        .payment-details {
+            display: none;
+        }
+    </style>
+    <script>
+        function updatePaymentForm() {
+            const paymentMethod = document.getElementById('payment_method').value;
+            const cardDetails = document.getElementById('card_details');
+            const paypalDetails = document.getElementById('paypal_details');
+            const bankDetails = document.getElementById('bank_details');
+
+            // Hide all payment details by default
+            cardDetails.style.display = 'none';
+            paypalDetails.style.display = 'none';
+            bankDetails.style.display = 'none';
+
+            // Show payment details based on selected method
+            if (paymentMethod === 'credit') {
+                cardDetails.style.display = 'block';
+            } else if (paymentMethod === 'paypal') {
+                paypalDetails.style.display = 'block';
+            } else if (paymentMethod === 'bank') {
+                bankDetails.style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Payment Method and Details</h2>
+        <form action="{{ url_for('payment_confirmation') }}" method="POST">
+            <div>
+                <label for="payment_method">Choose a payment method:</label>
+                <select name="payment_method" id="payment_method" onchange="updatePaymentForm()" required>
+                    <option value="credit">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="bank">Bank Transfer</option>
+                </select>
+            </div>
+            <div id="card_details" class="payment-details">
+                <label for="card_number">Card Number</label>
+                <input type="text" id="card_number" name="card_number" placeholder="Enter Card Number">
+                <label for="expiry_date">Expiry Date</label>
+                <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" name="cvv" placeholder="Enter CVV">
+            </div>
+            <div id="paypal_details" class="payment-details">
+                <label for="paypal_email">PayPal Email</label>
+                <input type="email" id="paypal_email" name="paypal_email" placeholder="Enter PayPal Email">
+            </div>
+            <div id="bank_details" class="payment-details">
+                <label for="bank_account">Bank Account Number</label>
+                <input type="text" id="bank_account" name="bank_account" placeholder="Enter Bank Account Number">
+                <label for="bank_name">Bank Name</label>
+                <input type="text" id="bank_name" name="bank_name" placeholder="Enter Bank Name">
+            </div>
+            <button type="submit">Confirm Payment</button>
+        </form>
+    </div>
+    <script>
+        window.onload = updatePaymentForm;
+    </script>
+</body>
+</html>

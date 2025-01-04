@@ -2,221 +2,118 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Session</title>
+    <title>Select Session Type</title>
+    <link rel="stylesheet" href="static/css/style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #2c2c2c;
-            color: #f5f5dc;
             margin: 0;
-            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #2c2c2c; /* Deep Gray */
+            color: #f5f5dc; /* Cream */
         }
-
+        .navbar {
+            display: flex;
+            justify-content: flex-start; /* Align "Judo" to the left */
+            align-items: center;
+            padding: 15px 30px;
+            background: #3c3c3c; /* Slightly lighter deep gray */
+            color: #ffca28; /* Mustard Yellow */
+            border-bottom: 2px solid #1e40af; /* Ultramarine */
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #ffca28; /* Mustard Yellow */
+        }
+        .main-container {
+            display: flex;
+            flex-grow: 1; /* Allow the container to fill the remaining height */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
         .container {
-            max-width: 600px;
-            margin: 50px auto;
+            width: 400px;
             padding: 20px;
-            background: #3c3c3c;
+            background: #3c3c3c; /* Slightly lighter gray */
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            color: #ffca28;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #5a5a5a;
             text-align: center;
-            margin-bottom: 20px;
         }
-
+        h2 {
+            text-align: center;
+            color: #ffca28; /* Mustard Yellow */
+        }
+        .form-group {
+            margin: 20px 0;
+        }
         label {
-            display: block;
-            font-size: 1.2rem;
             margin-bottom: 10px;
-            color: #f5f5dc;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        input[type="radio"] {
-            width: auto;
-            margin-right: 10px;
-        }
-
-        .fee {
-            font-size: 1.5rem;
-            color: #ffca28;
-            margin-bottom: 20px;
+            font-weight: bold;
             text-align: center;
-        }
-
-        .button {
             display: block;
+        }
+        select {
             width: 100%;
             padding: 10px;
-            background: #ffca28;
-            color: #2c2c2c;
-            font-size: 1.2rem;
-            border: none;
+            background: #2c2c2c;
+            border: 1px solid #5a5a5a;
             border-radius: 5px;
-            cursor: pointer;
+            color: #f5f5dc;
+            font-size: 1rem;
             text-align: center;
+        }
+        select:focus {
+            outline: none;
+            border-color: #1e40af; /* Ultramarine */
+            box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
+        }
+        .button-group {
             margin-top: 20px;
         }
-
-        .button:hover {
-            background: #d4a019;
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #ffca28; /* Mustard Yellow */
+            border: none;
+            border-radius: 5px;
+            color: #2c2c2c;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 10px; /* Add space between buttons */
         }
-
-        .payment-info {
-            display: none;
+        button:hover {
+            background: #ffb300; /* Slightly darker mustard yellow */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Payment Session</h1>
-        
-        <div id="item-info">
-            <p class="fee">
-                <strong>Item:</strong> <span id="item-name"></span><br>
-                <strong>Fee:</strong> <span id="item-fee">Select a category</span>
-            </p>
-        </div>
-
-        <div id="plan-options" style="display: none;">
-            <label>Select Plan Category:</label>
-            <form id="plan-form">
-                <input type="radio" name="plan-type" value="monthly" id="monthly" onclick="updateFee('monthly')">
-                <label for="monthly">Monthly</label><br>
-                <input type="radio" name="plan-type" value="weekly" id="weekly" onclick="updateFee('weekly')">
-                <label for="weekly">Weekly</label><br>
-                <input type="radio" name="plan-type" value="hourly" id="hourly" onclick="updateFee('hourly')">
-                <label for="hourly">Hourly</label>
-            </form>
-        </div>
-
-        <div id="payment-method">
-            <label>Select Payment Method:</label>
-            <form id="payment-form">
-                <input type="radio" name="payment-method" value="credit" id="credit" onclick="showPaymentInfo('credit')">
-                <label for="credit">Credit Card</label><br>
-                <input type="radio" name="payment-method" value="paypal" id="paypal" onclick="showPaymentInfo('paypal')">
-                <label for="paypal">PayPal</label><br>
-                <input type="radio" name="payment-method" value="bank" id="bank" onclick="showPaymentInfo('bank')">
-                <label for="bank">Bank Transfer</label>
-            </form>
-        </div>
-
-        <!-- Payment Information -->
-        <div id="payment-info" class="payment-info">
-            <label for="card-number" id="credit-label" style="display: none;">Card Number:</label>
-            <input type="text" id="card-number" style="display: none;" placeholder="Enter your card number">
-
-            <label for="paypal-email" id="paypal-label" style="display: none;">PayPal Email:</label>
-            <input type="email" id="paypal-email" style="display: none;" placeholder="Enter your PayPal email">
-
-            <label for="bank-account" id="bank-label" style="display: none;">Bank Account Number:</label>
-            <input type="text" id="bank-account" style="display: none;" placeholder="Enter your bank account number">
-        </div>
-
-        <button class="button" onclick="submitPayment()">Submit Payment</button>
+    <div class="navbar">
+        <h1>Judo</h1>
     </div>
-
-    <script>
-        let itemType = ""; // 'plan' or 'competition'
-        let selectedPlanType = null;
-        const planFees = {
-            monthly: 100,  // Example fee for monthly
-            weekly: 30,    // Example fee for weekly
-            hourly: 10     // Example fee for hourly
-        };
-
-        // Initialize the page
-        function initializePaymentSession(type, name, fees = null) {
-            itemType = type;
-            document.getElementById('item-name').textContent = name;
-
-            if (type === 'plan') {
-                document.getElementById('plan-options').style.display = 'block';
-                document.getElementById('item-fee').textContent = "Select a category";
-            } else if (type === 'competition') {
-                document.getElementById('plan-options').style.display = 'none';
-                document.getElementById('item-fee').textContent = `$${fees}`;
-            }
-        }
-
-        // Update the fee display based on the selected plan type
-        function updateFee(planType) {
-            selectedPlanType = planType;
-            const fee = planFees[planType];
-            document.getElementById('item-fee').textContent = `$${fee}`;
-        }
-
-        // Show payment information fields based on the selected payment method
-        function showPaymentInfo(method) {
-            document.getElementById('credit-label').style.display = method === 'credit' ? 'block' : 'none';
-            document.getElementById('card-number').style.display = method === 'credit' ? 'block' : 'none';
-
-            document.getElementById('paypal-label').style.display = method === 'paypal' ? 'block' : 'none';
-            document.getElementById('paypal-email').style.display = method === 'paypal' ? 'block' : 'none';
-
-            document.getElementById('bank-label').style.display = method === 'bank' ? 'block' : 'none';
-            document.getElementById('bank-account').style.display = method === 'bank' ? 'block' : 'none';
-        }
-
-        // Submit the payment
-        function submitPayment() {
-            const paymentMethod = document.querySelector('input[name="payment-method"]:checked');
-            if (!paymentMethod) {
-                alert('Please select a payment method.');
-                return;
-            }
-
-            if (itemType === 'plan' && !selectedPlanType) {
-                alert('Please select a plan category.');
-                return;
-            }
-
-            const paymentInfo = {
-                card: document.getElementById('card-number').value,
-                paypal: document.getElementById('paypal-email').value,
-                bank: document.getElementById('bank-account').value
-            };
-
-            const payload = {
-                type: itemType,
-                name: document.getElementById('item-name').textContent,
-                fee: itemType === 'plan' ? planFees[selectedPlanType] : document.getElementById('item-fee').textContent.replace('$', ''),
-                payment_method: paymentMethod.value,
-                plan_category: itemType === 'plan' ? selectedPlanType : null,
-                payment_info: paymentInfo[paymentMethod.value]
-            };
-
-            // Simulate sending payment data
-            console.log(payload);
-            alert('Payment submitted successfully!');
-        }
-
-        // Example usage:
-        // For a plan: initializePaymentSession('plan', 'Advanced Training Plan');
-        // For a competition: initializePaymentSession('competition', 'National Judo Cup', 50);
-    </script>
-</body>
-</html>
-</title>
-</head>
-<body>
-
+    <div class="main-container">
+        <div class="container">
+            <h2>Select Session Type</h2>
+            <form action="{{ url_for('payment_method') }}" method="POST">
+                <div class="form-group">
+                    <label for="session_type">Choose a session type:</label>
+                    <select name="session_type" id="session_type" required>
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Next</button>
+                    <button type="button" onclick="window.history.back();">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

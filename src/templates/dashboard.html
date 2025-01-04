@@ -168,9 +168,6 @@
             background: #d4a019;
         }
 
-        .payment-method label {
-            font-size: 1.2rem;
-        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -188,9 +185,6 @@
             });
         });
 
-        let selectedPlan = null;
-        let planFees = {};
-
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
@@ -201,92 +195,6 @@
         function closeModal() {
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('modal').style.display = 'none';
-        }
-
-        function showSessionSelection(planName, monthlyFee, weeklyFee, privateFee) {
-            selectedPlan = planName;
-            planFees = { monthly: monthlyFee, weekly: weeklyFee, private: privateFee };
-            document.getElementById('session-selection').style.display = 'block';
-        }
-
-        function closeSessionModal() {
-            document.getElementById('session-selection').style.display = 'none';
-        }
-
-        function submitSession() {
-            const sessionType = document.querySelector('input[name="session_type"]:checked');
-
-            if (!sessionType) {
-                alert('Please select a session type.');
-                return;
-            }
-
-            const selectedSession = sessionType.value;
-            const fee = planFees[selectedSession];
-
-            document.getElementById('session-selection').style.display = 'none';
-            showPaymentOptions();
-        }
-
-        function showPaymentOptions() {
-            const paymentDiv = document.getElementById('payment-method');
-            paymentDiv.style.display = paymentDiv.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function submitPaymentMethod() {
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-
-            if (!paymentMethod) {
-                alert('Please select a payment method.');
-                return;
-            }
-
-            const method = paymentMethod.value;
-            document.getElementById('payment-method').style.display = 'none';
-
-            if (method === 'credit') {
-                document.getElementById('credit-details').style.display = 'block';
-                document.getElementById('paypal-details').style.display = 'none';
-                document.getElementById('bank-details').style.display = 'none';
-            } else if (method === 'paypal') {
-                document.getElementById('credit-details').style.display = 'none';
-                document.getElementById('paypal-details').style.display = 'block';
-                document.getElementById('bank-details').style.display = 'none';
-            } else if (method === 'bank') {
-                document.getElementById('credit-details').style.display = 'none';
-                document.getElementById('paypal-details').style.display = 'none';
-                document.getElementById('bank-details').style.display = 'block';
-            }
-
-            document.getElementById('payment-details').style.display = 'block';
-        }
-
-        function submitPaymentDetails() {
-            const formData = new FormData(document.getElementById('payment-details-form'));
-            const paymentData = Object.fromEntries(formData);
-
-            fetch('/add_payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(paymentData),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Payment details saved successfully!');
-                    closePaymentDetails();
-                } else {
-                    alert('Failed to save payment details. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving payment details:', error);
-                alert('An error occurred while saving payment details.');
-            });
-        }
-
-        function closePaymentDetails() {
-            document.getElementById('payment-details').style.display = 'none';
         }
     </script>
 </head>
@@ -318,11 +226,6 @@
                     <strong>Age:</strong> {{ athlete.age }}<br>
                     <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
                     <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>
-                    <br>
-                    <strong>Training Plans:</strong><br>
-                        {% for plan in athlete.plans %}
-                            {{ plan.plan_name }}<br>
-                        {% endfor %}
                 `)">
                     {{ athlete.name[0] }}
                 </div>
@@ -335,38 +238,40 @@
         <h2>Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
-                <div class="card" onclick="showDetails('{{ plan.plan_name }}', `
-                    <strong>description:</strong> {{ plan.description }}<br>
+                <div class="card" onclick="showDetails('{{ plan.plan_name }}',
+                    `<strong>Description:</strong> {{ plan.description }}<br>
                     <strong>Fee:</strong> {{ plan.monthly_fee }}<br>
                     <strong>Weekly Fee:</strong> {{ plan.weekly_fee }}<br>
                     <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
                     <strong>Category:</strong> {{ plan.category }}<br>
                     <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
-                    <button class='modal-close' onclick='showSessionSelection(event)'>Register</button>
-                `)">
+                    <button class='modal-close' onclick='window.location.href=' {{ generate_payment_url(plan.training_plan_id) }}''>Register</button>`
+                )">
                     {{ plan.plan_name[0] }}
                 </div>
             {% endfor %}
         </div>
     </div>
 
+
     <!-- Competitions Section -->
     <div class="section" id="competitions">
         <h2>Competitions</h2>
         <div class="scroll-container">
             {% for competition in competitions %}
-            <div class="card" onclick="showDetails('Competition: {{ competition.competition_name }}', `
-                <strong>Location:</strong> {{ competition.location }}<br>
-                <strong>Date:</strong> {{ competition.date }}<br>
-                <strong>Competition Fee:</strong> {{ competition.entry_fee }}<br>
-                <strong>Category:</strong> {{ competition.weight_category }}<br>
-                <button class='modal-close' onclick='showPaymentOptions(event)'>Register</button>
-            `)">
-                {{ competition.competition_name[0] }}
-            </div>
+                <div class="card" onclick="showDetails('Competition: {{ competition.competition_name }}', `
+                    <strong>Location:</strong> {{ competition.location }}<br>
+                    <strong>Date:</strong> {{ competition.date }}<br>
+                    <strong>Competition Fee:</strong> {{ competition.entry_fee }}<br>
+                    <strong>Category:</strong>{{ competition.weight_category }}<br>
+                    <button class='modal-close' onclick='window.location.href=' {{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }} ''>Register</button>
+                `)">
+                    {{ competition.competition_name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
+
 
     <!-- Modal for details -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
@@ -374,55 +279,6 @@
         <div class="modal-header" id="modal-title"></div>
         <div class="modal-content" id="modal-content"></div>
         <button class="modal-close" onclick="closeModal()">Close</button>
-    </div>
-
-    <!-- Session selection modal -->
-    <div id="session-selection" class="modal">
-        <h3>Choose a Session Type</h3>
-        <label><input type="radio" name="session_type" value="monthly"> Monthly - $500</label><br>
-        <label><input type="radio" name="session_type" value="weekly"> Weekly - $300</label><br>
-        <label><input type="radio" name="session_type" value="private"> Private - $100</label><br>
-        <button class="modal-close" onclick="submitSession()">Submit</button>
-        <button class="modal-close" onclick="closeSessionModal()">Close</button>
-    </div>
-
-    <!-- Payment method modal -->
-    <div id="payment-method" class="modal" style="display:none;">
-        <h3>Select Payment Method</h3>
-        <label><input type="radio" name="payment_method" value="credit"> Credit Card</label><br>
-        <label><input type="radio" name="payment_method" value="paypal"> PayPal</label><br>
-        <label><input type="radio" name="payment_method" value="bank"> Bank Transfer</label><br>
-        <button class="modal-close" onclick="submitPaymentMethod()">Next</button>
-    </div>
-
-    <!-- Payment details modal -->
-    <div id="payment-details" class="modal" style="display:none;">
-        <h3>Enter Payment Details</h3>
-        <div id="credit-details" style="display:none;">
-            <form id="payment-details-form">
-                <label>Card Number:</label>
-                <input type="text" name="card_number"><br>
-                <label>Expiration Date:</label>
-                <input type="text" name="expiration_date"><br>
-                <label>CVV:</label>
-                <input type="text" name="cvv"><br>
-                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
-            </form>
-        </div>
-        <div id="paypal-details" style="display:none;">
-            <form id="payment-details-form">
-                <label>PayPal Email:</label>
-                <input type="email" name="paypal_email"><br>
-                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
-            </form>
-        </div>
-        <div id="bank-details" style="display:none;">
-            <form id="payment-details-form">
-                <label>Bank Account Number:</label>
-                <input type="text" name="bank_account"><br>
-                <button type="button" class="modal-close" onclick="submitPaymentDetails()">Submit Payment</button>
-            </form>
-        </div>
     </div>
 </body>
 </html>

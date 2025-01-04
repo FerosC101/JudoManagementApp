@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competition Registration</title>
+</head>
+<body>
+    <h1>Competition Registration</h1>
+
+    {% if athlete_training_plan in ['intermediate', 'elite'] %}
+    <form action="{{ url_for('register_competition') }}" method="POST">
+        <label for="competition">Select Competition:</label><br>
+        <select name="competition" id="competition">
+            {% for competition in competitions %}
+                <option value="{{ competition.competition_id }}">{{ competition.name }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <input type="submit" value="Register for Competition">
+    </form>
+    {% else %}
+    <p>You need to be enrolled in an intermediate or elite plan to participate in competitions.</p>
+    {% endif %}
+</body>
+</html>
