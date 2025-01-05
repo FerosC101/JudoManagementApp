@@ -186,25 +186,26 @@
         });
 
         function registerForPlan(athleteId, trainingPlanId) {
-            // Create a form and submit it programmatically
-            var form = document.createElement("form");
-            form.method = "POST";
-            form.action = '{{ url_for("payment_session_type", athlete_id="athlete_id_placeholder", training_plan_id="training_plan_id_placeholder") }}'
-                .replace("athlete_id_placeholder", athleteId)
-                .replace("training_plan_id_placeholder", trainingPlanId);
+        // Create a form and submit it programmatically
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = '{{ url_for("payment_session_type", athlete_id="athlete_id_placeholder", training_plan_id="training_plan_id_placeholder") }}'
+            .replace("athlete_id_placeholder", athleteId)
+            .replace("training_plan_id_placeholder", trainingPlanId);
 
-            // Add a hidden field for session_type (this is needed for the POST request)
-            var sessionTypeField = document.createElement("input");
-            sessionTypeField.type = "hidden";
-            sessionTypeField.name = "session_type";
-            sessionTypeField.value = "default_session"; // Replace with dynamic session type if needed
+        // Add a hidden field for session_type (if necessary)
+        var sessionTypeField = document.createElement("input");
+        sessionTypeField.type = "hidden";
+        sessionTypeField.name = "session_type";
+        sessionTypeField.value = "default_session"; // Or whatever the session type value should be
 
-            form.appendChild(sessionTypeField);
+        form.appendChild(sessionTypeField);
 
-            // Append the form to the body and submit
-            document.body.appendChild(form);
-            form.submit();
-        }
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
+    }
+
 
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
