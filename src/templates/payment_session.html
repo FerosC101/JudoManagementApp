@@ -99,7 +99,8 @@
     <div class="main-container">
         <div class="container">
             <h2>Select Session Type</h2>
-            <form action="{{ url_for('payment_method') }}" method="POST">
+            <!-- This form is used when a GET request is made, it allows the user to select the session type manually -->
+            <form action="{{ url_for('payment_session_type', athlete_id=athlete.athlete_id, training_plan_id=training_plan.training_plan_id) }}" method="POST">
                 <div class="form-group">
                     <label for="session_type">Choose a session type:</label>
                     <select name="session_type" id="session_type" required>
@@ -113,7 +114,11 @@
                     <button type="button" onclick="window.history.back();">Back</button>
                 </div>
             </form>
+
+            <!-- JavaScript function will be used to register the athlete for a plan -->
+            <button type="button" onclick="registerForPlan('{{ athlete.athlete_id }}', '{{ training_plan.training_plan_id }}')">Register for Plan</button>
         </div>
     </div>
 </body>
+
 </html>

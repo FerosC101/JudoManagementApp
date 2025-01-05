@@ -185,6 +185,27 @@
             });
         });
 
+        function registerForPlan(athleteId, trainingPlanId) {
+            // Create a form and submit it programmatically
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = '{{ url_for("payment_session_type", athlete_id="athlete_id_placeholder", training_plan_id="training_plan_id_placeholder") }}'
+                .replace("athlete_id_placeholder", athleteId)
+                .replace("training_plan_id_placeholder", trainingPlanId);
+
+            // Add a hidden field for session_type (this is needed for the POST request)
+            var sessionTypeField = document.createElement("input");
+            sessionTypeField.type = "hidden";
+            sessionTypeField.name = "session_type";
+            sessionTypeField.value = "default_session"; // Replace with dynamic session type if needed
+
+            form.appendChild(sessionTypeField);
+
+            // Append the form to the body and submit
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
@@ -233,7 +254,7 @@
         </div>
     </div>
 
-    <!-- Training Plans Section -->
+     <!-- Training Plans Section -->
     <div class="section" id="plans">
         <h2>Plans</h2>
         <div class="scroll-container">
@@ -245,13 +266,16 @@
                     <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
                     <strong>Category:</strong> {{ plan.category }}<br>
                     <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
-                    <button class='modal-close' onclick='window.location.href=' {{ generate_payment_url(plan.training_plan_id) }}''>Register</button>`
-                )">
+                    <button class='modal-close' onclick='registerForPlan({{ athlete_id }}, {{ plan.training_plan_id }})'>
+                        Register to {{ plan.plan_name }}
+                    </button>
+                    `)">
                     {{ plan.plan_name[0] }}
-                </div>
+                </div> <!-- Closing the card div here -->
             {% endfor %}
         </div>
     </div>
+
 
 
     <!-- Competitions Section -->
