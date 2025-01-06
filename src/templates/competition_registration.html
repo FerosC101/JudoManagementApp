@@ -3,24 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Competition Registration</title>
+    <title>Competition Registration and Payment</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #2c2c2c; /* Deep Gray */
+            color: #f5f5dc; /* Cream */
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 50px auto;
+            background: #3c3c3c; /* Slightly lighter gray */
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #5a5a5a;
+        }
+        h2 {
+            text-align: center;
+            color: #ffca28; /* Mustard Yellow */
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .competition-details {
+            background: #2c2c2c; /* Deep Gray */
+            border: 1px solid #5a5a5a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .competition-details h3 {
+            color: #ffca28;
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        .competition-details p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        select, input {
+            background: #2c2c2c;
+            border: 1px solid #5a5a5a;
+            color: #f5f5dc;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #1e40af; /* Ultramarine */
+            box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
+        }
+        button {
+            background: #ffca28; /* Mustard Yellow */
+            border: none;
+            color: #2c2c2c;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #ffb300; /* Slightly darker mustard */
+        }
+        .payment-details {
+            display: none;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        .alert-success {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        .alert-error {
+            background-color: #f44336;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Competition Registration</h1>
+    <div class="container">
+        <h2>Competition Registration and Payment</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    {% if athlete_training_plan in ['intermediate', 'elite'] %}
-    <form action="{{ url_for('register_competition') }}" method="POST">
-        <label for="competition">Select Competition:</label><br>
-        <select name="competition" id="competition">
-            {% for competition in competitions %}
-                <option value="{{ competition.competition_id }}">{{ competition.name }}</option>
-            {% endfor %}
-        </select><br><br>
+        {% if athlete and competition %}
+            <div class="competition-details">
+                <h3>{{ competition.competition_name }}</h3>
+                <p><strong>Location:</strong> {{ competition.location }}</p>
+                <p><strong>Date:</strong> {{ competition.date }}</p>
+                <p><strong>Entry Fee:</strong> {{ competition.entry_fee }}</p>
+                <p><strong>Category:</strong> {{ competition.weight_category }}</p>
+            </div>
 
-        <input type="submit" value="Register for Competition">
-    </form>
-    {% else %}
-    <p>You need to be enrolled in an intermediate or elite plan to participate in competitions.</p>
-    {% endif %}
+            <form action="{{ url_for('register_competition', athlete_id=athlete.athlete_id, competition_id=competition.competition_id) }}" method="POST">
+                <div class="form-group">
+                    <label for="payment_method">Choose a Payment Method:</label>
+                    <select name="payment_method" id="payment_method" onchange="updatePaymentForm()" required>
+                        <option value="">Select payment method</option>
+                        <option value="credit">Credit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div id="card_details" class="payment-details">
+                    <div class="form-group">
+                        <label for="card_number">Card Number</label>
+                        <input type="text" id="card_number" name="card_number" placeholder="Enter Card Number">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiry_date">Expiry Date</label>
+                        <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" name="cvv" placeholder="Enter CVV">
+                    </div>
+                </div>
+
+                <div id="paypal_details" class="payment-details">
+                    <div class="form-group">
+                        <label for="paypal_email">PayPal Email</label>
+                        <input type="email" id="paypal_email" name="paypal_email" placeholder="Enter PayPal Email">
+                    </div>
+                </div>
+
+                <div id="bank_details" class="payment-details">
+                    <div class="form-group">
+                        <label for="bank_account">Bank Account Number</label>
+                        <input type="text" id="bank_account" name="bank_account" placeholder="Enter Bank Account Number">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank_name">Bank Name</label>
+                        <input type="text" id="bank_name" name="bank_name" placeholder="Enter Bank Name">
+                    </div>
+                </div>
+
+                <button type="submit">Register and Pay</button>
+            </form>
+        {% else %}
+            <p>Invalid competition or athlete details.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function updatePaymentForm() {
+            const paymentMethod = document.getElementById('payment_method').value;
+            const cardDetails = document.getElementById('card_details');
+            const paypalDetails = document.getElementById('paypal_details');
+            const bankDetails = document.getElementById('bank_details');
+
+            cardDetails.style.display = 'none';
+            paypalDetails.style.display = 'none';
+            bankDetails.style.display = 'none';
+
+            if (paymentMethod === 'credit') {
+                cardDetails.style.display = 'block';
+            } else if (paymentMethod === 'paypal') {
+                paypalDetails.style.display = 'block';
+            } else if (paymentMethod === 'bank') {
+                bankDetails.style.display = 'block';
+            }
+        }
+
+        window.onload = updatePaymentForm;
+    </script>
 </body>
 </html>

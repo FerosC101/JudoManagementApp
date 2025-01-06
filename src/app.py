@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from src.extension import db
-from src.model import User, Athlete, TrainingPlan, Competition, AthleteTraining, Payment
+from src.model import User, Athlete, TrainingPlan, Competition, AthleteTraining, Payment, AthleteCompetition
 import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -245,24 +245,41 @@ def register_competition(athlete_id, competition_id):
         return redirect(url_for('dashboard'))
 
     training_plan = TrainingPlan.query.filter_by(training_plan_id=athlete_training.training_plan_id).first()
-    if training_plan and training_plan.plan_level in ['intermediate', 'elite']:
+    if training_plan and training_plan.category in ['Intermediate', 'Elite']:
         if request.method == 'POST':
-            # Add competition registration logic here
-            competition_registration = Competition(
-                athlete_id=athlete_id,
-                competition_id=competition_id,
-                registration_date=datetime.now()
-            )
-            db.session.add(competition_registration)
-            db.session.commit()
+            try:
+                # Check if already registered
+                existing_registration = AthleteCompetition.query.filter_by(
+                    athlete_id=athlete_id,
+                    competition_id=competition_id
+                ).first()
 
-            flash("Competition registration successful!", "success")
-            return redirect(url_for('dashboard'))
+                if existing_registration:
+                    flash("You are already registered for this competition.", "error")
+                    return redirect(url_for('dashboard'))
 
-        return render_template('register_competition.html', athlete=athlete, competition=competition)
+                # Create athlete competition registration
+                athlete_competition = AthleteCompetition(
+                    athlete_id=athlete_id,
+                    competition_id=competition_id,
+                    registration_date=datetime.datetime.utcnow()
+                )
+                db.session.add(athlete_competition)
+                db.session.commit()
+
+                flash("Competition registration successful!", "success")
+                return redirect(url_for('dashboard'))
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error during registration: {str(e)}")  # Print the actual error
+                flash(f"Registration error: {str(e)}", "error")
+                return render_template('competition_registration.html', athlete=athlete, competition=competition)
+
+        return render_template('competition_registration.html', athlete=athlete, competition=competition)
 
     flash("You must be enrolled in an intermediate or elite plan to register for competitions.", "error")
     return redirect(url_for('dashboard'))
+
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':

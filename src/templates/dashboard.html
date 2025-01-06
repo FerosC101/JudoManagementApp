@@ -171,6 +171,24 @@
             background: #d4a019;
         }
 
+        .register-button {
+            display: block;
+            background: #ffca28;
+            border: none;
+            color: #2c2c2c;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px auto 0;
+            width: 150px;
+            text-align: center;
+        }
+
+        .register-button:hover {
+            background: #d4a019;
+            transform: scale(1.05);
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -192,24 +210,31 @@
             const athleteId = button.getAttribute('data-athlete-id');
             const trainingPlanId = button.getAttribute('data-plan-id');
 
-            console.log("Registering for Plan - Athlete ID:", athleteId, "Training Plan ID:", trainingPlanId); // Debugging
-
-            // Create a form dynamically to submit the data
             const form = document.createElement("form");
             form.method = "POST";
             form.action = `/payment_session_type/${athleteId}/${trainingPlanId}`;
 
-            // Add a hidden field for session type
             const sessionTypeField = document.createElement("input");
             sessionTypeField.type = "hidden";
             sessionTypeField.name = "session_type";
-            sessionTypeField.value = "default_session"; // Ensure default session is set here
+            sessionTypeField.value = "default_session";
 
             form.appendChild(sessionTypeField);
             document.body.appendChild(form);
             form.submit();
         }
 
+        function showCompetitionDetails(card) {
+            const registerUrl = card.dataset.registerUrl;
+            const details = `Competition: ${card.dataset.competitionName}<br>
+                <strong>Location:</strong> ${card.dataset.location}<br>
+                <strong>Date:</strong> ${card.dataset.date}<br>
+                <strong>Competition Fee:</strong> ${card.dataset.entryFee}<br>
+                <strong>Category:</strong> ${card.dataset.category}<br>
+                <a href="${registerUrl}" class="register-button">Register</a>`;
+
+            showDetails(card.dataset.competitionName, details);
+        }
 
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
@@ -243,7 +268,6 @@
         </div>
     </div>
 
-    <!-- Athletes Section -->
     <div class="section" id="athletes">
         <h2>Athletes</h2>
         <div class="scroll-container">
@@ -259,8 +283,6 @@
         </div>
     </div>
 
-
-    <!-- Training Plans Section -->
     <div class="section" id="plans">
         <h2>Plans</h2>
         <div class="scroll-container">
@@ -287,31 +309,28 @@
         </div>
     </div>
 
-    <!-- Competitions Section -->
     <div class="section" id="competitions">
         <h2>Competitions</h2>
         <div class="scroll-container">
             {% for competition in competitions %}
-                <div class="card" onclick="showDetails('Competition: {{ competition.competition_name }}', `
-                    <strong>Location:</strong> {{ competition.location }}<br>
-                    <strong>Date:</strong> {{ competition.date }}<br>
-                    <strong>Competition Fee:</strong> {{ competition.entry_fee }}<br>
-                    <strong>Category:</strong> {{ competition.weight_category }}<br>
-                    <a href='{{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }}'
-                       class="button">Register</a>
-                `)">
+                <div class="card"
+                    data-competition-name="{{ competition.competition_name }}"
+                    data-location="{{ competition.location }}"
+                    data-date="{{ competition.date }}"
+                    data-entry-fee="{{ competition.entry_fee }}"
+                    data-category="{{ competition.weight_category }}"
+                    data-register-url="{{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }}"
+                    onclick="showCompetitionDetails(this)">
                     {{ competition.competition_name[0] }}
                 </div>
             {% endfor %}
         </div>
     </div>
 
-
-    <!-- Modal for details -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
     <div id="modal" class="modal">
-        <div class="modal-header" id="modal-title"></div>
-        <div class="modal-content" id="modal-content"></div>
+        <div id="modal-title" class="modal-header"></div>
+        <div id="modal-content" class="modal-content"></div>
         <button class="modal-close" onclick="closeModal()">Close</button>
     </div>
 </body>
