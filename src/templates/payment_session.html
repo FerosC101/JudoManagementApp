@@ -99,26 +99,43 @@
     <div class="main-container">
         <div class="container">
             <h2>Select Session Type</h2>
-            <!-- This form is used when a GET request is made, it allows the user to select the session type manually -->
-            <form action="{{ url_for('payment_session_type', athlete_id=athlete.athlete_id, training_plan_id=training_plan.training_plan_id) }}" method="POST">
+            <form action="{{ url_for('payment_method',
+                athlete_id=athlete.athlete_id,
+                plan_id=training_plan.training_plan_id) }}"
+                method="POST"
+                id="sessionForm">
                 <div class="form-group">
                     <label for="session_type">Choose a session type:</label>
                     <select name="session_type" id="session_type" required>
-                        <option value="monthly">Monthly</option>
+                        <option value="">Select a type</option>
                         <option value="weekly">Weekly</option>
-                        <option value="private">Private</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="private">Private (€{{ training_plan.private_hourly_fee }})</option>
                     </select>
                 </div>
                 <div class="button-group">
-                    <button type="submit">Next</button>
+                    <button type="submit">Proceed to Payment</button>
                     <button type="button" onclick="window.history.back();">Back</button>
                 </div>
             </form>
-
-            <!-- JavaScript function will be used to register the athlete for a plan -->
-            <button type="button" onclick="registerForPlan('{{ athlete.athlete_id }}', '{{ training_plan.training_plan_id }}')">Register for Plan</button>
         </div>
     </div>
-</body>
 
+    <script>
+        document.getElementById('sessionForm').onsubmit = function(e) {
+            e.preventDefault();
+            const sessionType = document.getElementById('session_type').value;
+            if (!sessionType) {
+                alert('Please select a session type');
+                return false;
+            }
+
+            // Update the form action URL with the selected session type
+            this.action = "{{ url_for('payment_method',
+                                     athlete_id=athlete.athlete_id,
+                                     plan_id=training_plan.training_plan_id) }}/" + sessionType;
+            this.submit();
+        };
+    </script>
+</body>
 </html>
