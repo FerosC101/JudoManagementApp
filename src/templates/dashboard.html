@@ -85,6 +85,9 @@
         }
 
         .card {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             flex: 0 0 auto;
             width: 220px;
             height: 180px;
@@ -185,26 +188,31 @@
             });
         });
 
-        function registerForPlan(athleteId, trainingPlanId) {
-        // Create a form and submit it programmatically
-        var form = document.createElement("form");
-        form.method = "POST";
-        form.action = '{{ url_for("payment_session_type", athlete_id="athlete_id_placeholder", training_plan_id="training_plan_id_placeholder") }}'
-            .replace("athlete_id_placeholder", athleteId)
-            .replace("training_plan_id_placeholder", trainingPlanId);
+        function registerForPlan(button) {
+            const athleteId = button.getAttribute('data-athlete-id');
+            const trainingPlanId = button.getAttribute('data-plan-id');
 
-        // Add a hidden field for session_type (if necessary)
-        var sessionTypeField = document.createElement("input");
-        sessionTypeField.type = "hidden";
-        sessionTypeField.name = "session_type";
-        sessionTypeField.value = "default_session"; // Or whatever the session type value should be
+            console.log("Registering for Plan - Athlete ID:", athleteId, "Training Plan ID:", trainingPlanId); // Debugging
 
-        form.appendChild(sessionTypeField);
+            // Create a form dynamically to submit the data
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = `/payment_session_type/${athleteId}/${trainingPlanId}`;
 
-        // Submit the form
-        document.body.appendChild(form);
-        form.submit();
-    }
+            // Add a hidden field for session type
+            const sessionTypeField = document.createElement("input");
+            sessionTypeField.type = "hidden";
+            sessionTypeField.name = "session_type";
+            sessionTypeField.value = "default_session"; // Adjust this if needed
+
+            form.appendChild(sessionTypeField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+
+
+
 
 
         function showDetails(title, content) {
@@ -255,27 +263,35 @@
         </div>
     </div>
 
-     <!-- Training Plans Section -->
+
+    <!-- Training Plans Section -->
     <div class="section" id="plans">
         <h2>Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
                 <div class="card" onclick="showDetails('{{ plan.plan_name }}',
-                    `<strong>Description:</strong> {{ plan.description }}<br>
-                    <strong>Fee:</strong> {{ plan.monthly_fee }}<br>
-                    <strong>Weekly Fee:</strong> {{ plan.weekly_fee }}<br>
-                    <strong>Private Hourly Fee:</strong> {{ plan.private_hourly_fee }}<br>
-                    <strong>Category:</strong> {{ plan.category }}<br>
-                    <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
-                    <button class='modal-close' onclick='registerForPlan({{ athlete_id }}, {{ plan.training_plan_id }})'>
-                        Register to {{ plan.plan_name }}
-                    </button>
-                    `)">
+                    '<strong>Description:</strong> {{ plan.description }}<br>' +
+                    '<strong>Monthly Fee:</strong> ${{ plan.monthly_fee }}<br>' +
+                    '<strong>Weekly Fee:</strong> ${{ plan.weekly_fee }}<br>' +
+                    '<strong>Private Hourly Fee:</strong> ${{ plan.private_hourly_fee }}<br>' +
+                    '<strong>Category:</strong> {{ plan.category }}<br>' +
+                    '<strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>' +
+                    '<button ' +
+                        'class=\'modal-close\' ' +
+                        'data-athlete-id=\'{{ athlete_id }}\' ' +
+                        'data-plan-id=\'{{ plan.training_plan_id }}\' ' +
+                        'onclick=\'registerForPlan(this); event.stopPropagation();\'' +
+                    '>' +
+                        'Register for {{ plan.plan_name }}' +
+                    '</button>'
+                )">
                     {{ plan.plan_name[0] }}
-                </div> <!-- Closing the card div here -->
+                </div>
             {% endfor %}
         </div>
     </div>
+
+
 
 
 

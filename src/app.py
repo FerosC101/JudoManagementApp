@@ -81,21 +81,23 @@ def register():
 
 @app.route('/dashboard')
 def dashboard():
+    # Ensure athlete_id is fetched from the session as a string
     athlete_id = session.get('athlete_id')
     if not athlete_id:
         return redirect(url_for('login'))
 
+    # Explicitly cast athlete_id to a string to prevent mismatches
+    athlete_id = str(athlete_id)
+
+    # Fetch the athlete using the correct athlete_id format
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
     if not athlete:
         return redirect(url_for('login'))
 
-    # Fetch all athletes, training plans, and competitions
+    # Fetch all data for display on the dashboard
     athletes = Athlete.query.all()
     plans = TrainingPlan.query.all()
     competitions = Competition.query.all()
-
-    def generate_payment_url(training_plan_id):
-        return url_for('payment_session_type', athlete_id=athlete_id, training_plan_id=training_plan_id)
 
     return render_template(
         'dashboard.html',
@@ -103,9 +105,9 @@ def dashboard():
         athletes=athletes,
         plans=plans,
         competitions=competitions,
-        athlete_id=athlete_id,  # Pass athlete_id to the template
-        generate_payment_url=generate_payment_url
+        athlete_id=athlete_id  # Explicitly pass the athlete_id
     )
+
 
 
 @app.route('/payment_session_type/<athlete_id>/<training_plan_id>', methods=['GET', 'POST'])
@@ -138,58 +140,77 @@ def payment_session_type(athlete_id, training_plan_id):
 
 @app.route('/payment_method/<athlete_id>/<plan_id>/<session_type>', methods=['GET', 'POST'])
 def payment_method(athlete_id, plan_id, session_type):
-    # Fetch the athlete and training plan details
-    athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
-    training_plan = TrainingPlan.query.filter_by(training_plan_id=plan_id).first()
+    try:
+        # Fetch the athlete and training plan details
+        athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
+        training_plan = TrainingPlan.query.filter_by(training_plan_id=plan_id).first()
 
-    if not athlete or not training_plan:
-        flash("Invalid athlete or training plan.", "error")
+        if not athlete or not training_plan:
+            flash("Invalid athlete or training plan.", "error")
+            return redirect(url_for('dashboard'))
+
+        # Validate session_type
+        valid_types = ['monthly', 'weekly', 'private']
+        if session_type not in valid_types:
+            flash("Invalid session type.", "error")
+            return redirect(url_for('payment_session_type', athlete_id=athlete_id, training_plan_id=plan_id))
+
+        if request.method == 'POST':
+            payment_method = request.form.get('payment_method')
+
+            if not payment_method:
+                flash("Payment method is required.", "error")
+                return render_template('payment_method.html',
+                                    athlete=athlete,
+                                    training_plan=training_plan,
+                                    session_type=session_type)
+
+            # Calculate the amount based on session type
+            amount = {
+                'monthly': training_plan.monthly_fee,
+                'weekly': training_plan.weekly_fee,
+                'private': training_plan.private_hourly_fee
+            }.get(session_type, 0)
+
+            try:
+                # Create the Payment and AthleteTraining records
+                new_payment = Payment(
+                    athlete_id=athlete_id,
+                    training_plan_id=training_plan.training_plan_id,
+                    amount=amount,
+                    payment_method=payment_method,
+                    plan_type=session_type,
+                )
+                db.session.add(new_payment)
+
+                new_training = AthleteTraining(
+                    athlete_id=athlete_id,
+                    training_plan_id=training_plan.training_plan_id,
+                    start_date=datetime.datetime.utcnow(),
+                    end_date=None
+                )
+                db.session.add(new_training)
+
+                db.session.commit()
+                flash("Payment successful and registration completed!", "success")
+                return redirect(url_for('dashboard'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Error processing payment: {str(e)}", "error")
+                return render_template('payment_method.html',
+                                    athlete=athlete,
+                                    training_plan=training_plan,
+                                    session_type=session_type)
+
+        return render_template('payment_method.html',
+                            athlete=athlete,
+                            training_plan=training_plan,
+                            session_type=session_type)
+
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for('dashboard'))
-
-    # Validate session_type
-    valid_types = ['monthly', 'weekly', 'private']
-    if session_type not in valid_types:
-        flash("Invalid session type.", "error")
-        return redirect(url_for('payment_session_type', athlete_id=athlete_id, training_plan_id=plan_id))
-
-    if request.method == 'POST':
-        payment_method = request.form.get('payment_method')
-
-        if not payment_method:
-            flash("Payment method is required.", "error")
-            return render_template('payment_method.html', athlete=athlete, training_plan=training_plan, session_type=session_type)
-
-        # Calculate the amount based on session type
-        amount = {
-            'monthly': training_plan.monthly_fee,
-            'weekly': training_plan.weekly_fee,
-            'private': training_plan.private_hourly_fee
-        }.get(session_type, 0)
-
-        # Create the Payment and AthleteTraining records
-        new_payment = Payment(
-            athlete_id=athlete_id,
-            training_plan_id=training_plan.training_plan_id,
-            amount=amount,
-            payment_method=payment_method,
-            plan_type=session_type,
-        )
-        db.session.add(new_payment)
-
-        new_training = AthleteTraining(
-            athlete_id=athlete_id,
-            training_plan_id=training_plan.training_plan_id,
-            start_date=datetime.datetime.utcnow(),
-            end_date=None
-        )
-        db.session.add(new_training)
-
-        db.session.commit()
-
-        flash("Payment successful and registration completed!", "success")
-        return redirect(url_for('dashboard'))
-
-    return render_template('payment_method.html', athlete=athlete, training_plan=training_plan, session_type=session_type)
 
 @app.route('/register_competition/<athlete_id>/<competition_id>', methods=['GET', 'POST'])
 def register_competition(athlete_id, competition_id):
