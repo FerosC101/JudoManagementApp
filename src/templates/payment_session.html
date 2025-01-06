@@ -99,7 +99,8 @@
     <div class="main-container">
         <div class="container">
             <h2>Select Session Type</h2>
-            <form method="POST" action="{{ url_for('payment_method', athlete_id=athlete.athlete_id, plan_id=training_plan.training_plan_id, session_type=session_type) }}" id="sessionForm">
+            <!-- Changed the form action to use training_plan_id instead of training_plan.training_plan_id -->
+            <form method="POST" action="{{ url_for('payment_session_type', athlete_id=athlete.athlete_id, training_plan_id=training_plan.training_plan_id) }}" id="sessionForm">
                 <div class="form-group">
                     <label for="session_type">Choose a session type:</label>
                     <select name="session_type" id="session_type" required>
@@ -120,13 +121,11 @@
     <script>
     document.getElementById('sessionForm').onsubmit = function(e) {
         const sessionType = document.getElementById('session_type').value;
-
         if (!sessionType) {
             e.preventDefault();
             alert('Please select a session type');
             return false;
         }
-        // Let the form submit naturally
         return true;
     };
     </script>

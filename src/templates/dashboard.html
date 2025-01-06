@@ -296,8 +296,9 @@
                     <strong>Location:</strong> {{ competition.location }}<br>
                     <strong>Date:</strong> {{ competition.date }}<br>
                     <strong>Competition Fee:</strong> {{ competition.entry_fee }}<br>
-                    <strong>Category:</strong>{{ competition.weight_category }}<br>
-                    <button class='modal-close' onclick='window.location.href=' {{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }} ''>Register</button>
+                    <strong>Category:</strong> {{ competition.weight_category }}<br>
+                    <a href='{{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }}'
+                       class="button">Register</a>
                 `)">
                     {{ competition.competition_name[0] }}
                 </div>

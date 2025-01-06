@@ -65,36 +65,16 @@
             display: none;
         }
     </style>
-    <script>
-        function updatePaymentForm() {
-            const paymentMethod = document.getElementById('payment_method').value;
-            const cardDetails = document.getElementById('card_details');
-            const paypalDetails = document.getElementById('paypal_details');
-            const bankDetails = document.getElementById('bank_details');
-
-            // Hide all payment details by default
-            cardDetails.style.display = 'none';
-            paypalDetails.style.display = 'none';
-            bankDetails.style.display = 'none';
-
-            // Show payment details based on selected method
-            if (paymentMethod === 'credit') {
-                cardDetails.style.display = 'block';
-            } else if (paymentMethod === 'paypal') {
-                paypalDetails.style.display = 'block';
-            } else if (paymentMethod === 'bank') {
-                bankDetails.style.display = 'block';
-            }
-        }
-    </script>
 </head>
-<body>
+<<body>
     <div class="container">
         <h2>Payment Method and Details</h2>
-        <form action="{{ url_for('payment_method') }}" method="POST">
+        <!-- Fixed the form action to include all necessary parameters -->
+        <form action="{{ url_for('payment_method', athlete_id=athlete.athlete_id, plan_id=training_plan.training_plan_id, session_type=session_type) }}" method="POST">
             <div>
                 <label for="payment_method">Choose a payment method:</label>
                 <select name="payment_method" id="payment_method" onchange="updatePaymentForm()" required>
+                    <option value="">Select payment method</option>
                     <option value="credit">Credit Card</option>
                     <option value="paypal">PayPal</option>
                     <option value="bank">Bank Transfer</option>
@@ -122,6 +102,27 @@
         </form>
     </div>
     <script>
+        function updatePaymentForm() {
+            const paymentMethod = document.getElementById('payment_method').value;
+            const cardDetails = document.getElementById('card_details');
+            const paypalDetails = document.getElementById('paypal_details');
+            const bankDetails = document.getElementById('bank_details');
+
+            // Hide all payment details by default
+            cardDetails.style.display = 'none';
+            paypalDetails.style.display = 'none';
+            bankDetails.style.display = 'none';
+
+            // Show payment details based on selected method
+            if (paymentMethod === 'credit') {
+                cardDetails.style.display = 'block';
+            } else if (paymentMethod === 'paypal') {
+                paypalDetails.style.display = 'block';
+            } else if (paymentMethod === 'bank') {
+                bankDetails.style.display = 'block';
+            }
+        }
+
         window.onload = updatePaymentForm;
     </script>
 </body>
