@@ -8,6 +8,7 @@ app.config.from_object('config.Config')
 app.secret_key = 'sigma'
 db.init_app(app)
 
+# Home Route
 @app.route('/')
 def home():
     return render_template('login.html')
@@ -29,6 +30,7 @@ def login():
             session['athlete_id'] = athlete_data['athlete'].athlete_id
             session['role'] = athlete_data['role'].lower()
 
+            # Redirect based on the role
             if athlete_data['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
             elif athlete_data['role'] == 'athlete':
@@ -41,6 +43,7 @@ def login():
 
     return render_template('login.html')
 
+# Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -95,11 +98,18 @@ def dashboard():
         athletes=athletes,
         plans=plans,
         competitions=competitions,
-        athlete_id=athlete_id
+        athlete_id=athlete_id  # Explicitly pass the athlete_id
     )
+
 
 @app.route('/payment_session_type/<athlete_id>/<training_plan_id>', methods=['GET', 'POST'])
 def payment_session_type(athlete_id, training_plan_id):
+    print(f"Attempting to access payment session for athlete_id: {athlete_id}, training_plan_id: {training_plan_id}")
+    session_type = request.form.get('session_type')
+    if not session_type:
+        # Handle missing session_type if necessary
+        return "Session Type Missing", 400
+
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
     training_plan = TrainingPlan.query.filter_by(training_plan_id=training_plan_id).first()
 
@@ -108,16 +118,24 @@ def payment_session_type(athlete_id, training_plan_id):
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        session_type = request.form.get('session_type')
+        session_type = request.form.get('session_type')  # Get selected session type from the form
+
+        print(f"Received session_type: {session_type}")
 
         if not session_type:
             flash("Session type is required.", "error")
             return render_template('payment_session.html', athlete=athlete, training_plan=training_plan)
 
+        valid_session_types = ['monthly', 'weekly', 'private']
+        if session_type not in valid_session_types:
+            flash("Invalid session type selected.", "error")
+            return render_template('payment_session.html', athlete=athlete, training_plan=training_plan)
+
+        # Redirect to the payment method page with valid parameters
         return redirect(url_for('payment_method',
                                 athlete_id=athlete_id,
                                 plan_id=training_plan_id,
-                                session_type=session_type))
+                                session_type=session_type))  # Pass session_type here
 
     return render_template('payment_session.html', athlete=athlete, training_plan=training_plan)
 
@@ -127,12 +145,17 @@ def payment_method(athlete_id, plan_id, session_type):
         athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
         training_plan = TrainingPlan.query.filter_by(training_plan_id=plan_id).first()
 
+        print(f"Athlete: {athlete}, Training Plan: {training_plan}")
+        print(f"Session Type received: '{session_type}'")  # Debugging: Log session_type value
+
         if not athlete or not training_plan:
             flash("Invalid athlete or training plan.", "error")
             return redirect(url_for('dashboard'))
 
+        # Validate session_type (strip extra spaces just in case)
         valid_types = ['monthly', 'weekly', 'private']
-        if session_type not in valid_types:
+        if session_type.strip() not in valid_types:
+            print(f"Invalid session type: {session_type}")  # Debugging: Check invalid session type
             flash("Invalid session type.", "error")
             return redirect(url_for('payment_session_type', athlete_id=athlete_id, training_plan_id=plan_id))
 
@@ -142,10 +165,11 @@ def payment_method(athlete_id, plan_id, session_type):
             if not payment_method:
                 flash("Payment method is required.", "error")
                 return render_template('payment_method.html',
-                                    athlete=athlete,
-                                    training_plan=training_plan,
-                                    session_type=session_type)
+                                       athlete=athlete,
+                                       training_plan=training_plan,
+                                       session_type=session_type)
 
+            # Logic for payment processing
             amount = {
                 'monthly': training_plan.monthly_fee,
                 'weekly': training_plan.weekly_fee,
@@ -178,14 +202,9 @@ def payment_method(athlete_id, plan_id, session_type):
                 db.session.rollback()
                 flash(f"Error processing payment: {str(e)}", "error")
                 return render_template('payment_method.html',
-                                    athlete=athlete,
-                                    training_plan=training_plan,
-                                    session_type=session_type)
-
-        return render_template('payment_method.html',
-                            athlete=athlete,
-                            training_plan=training_plan,
-                            session_type=session_type)
+                                       athlete=athlete,
+                                       training_plan=training_plan,
+                                       session_type=session_type)
 
     except Exception as e:
         flash(f"An error occurred: {str(e)}", "error")

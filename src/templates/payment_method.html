@@ -91,7 +91,7 @@
 <body>
     <div class="container">
         <h2>Payment Method and Details</h2>
-        <form action="{{ url_for('payment_confirmation') }}" method="POST">
+        <form action="{{ url_for('payment_method') }}" method="POST">
             <div>
                 <label for="payment_method">Choose a payment method:</label>
                 <select name="payment_method" id="payment_method" onchange="updatePaymentForm()" required>

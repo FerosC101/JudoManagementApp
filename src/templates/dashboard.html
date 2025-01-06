@@ -203,16 +203,12 @@
             const sessionTypeField = document.createElement("input");
             sessionTypeField.type = "hidden";
             sessionTypeField.name = "session_type";
-            sessionTypeField.value = "default_session"; // Adjust this if needed
+            sessionTypeField.value = "default_session"; // Ensure default session is set here
 
             form.appendChild(sessionTypeField);
             document.body.appendChild(form);
             form.submit();
         }
-
-
-
-
 
 
         function showDetails(title, content) {

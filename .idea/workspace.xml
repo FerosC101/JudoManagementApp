@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/payment_method.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/payment_method.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/payment_session.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/payment_session.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -154,7 +155,7 @@
       <workItem from="1735992501100" duration="12817000" />
       <workItem from="1736076504729" duration="8729000" />
       <workItem from="1736126751143" duration="5948000" />
-      <workItem from="1736147284976" duration="2646000" />
+      <workItem from="1736147284976" duration="5655000" />
     </task>
     <task id="LOCAL-00001" summary="c">
       <option name="closed" value="true" />
@@ -404,7 +405,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736149933796</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="right session but wont redirect">
+      <option name="closed" value="true" />
+      <created>1736149985293</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1736149985293</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -436,7 +445,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="right session but wont redirect" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1736149613564" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1736152498624" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$.coverage" NAME=" Coverage Results" MODIFIED="1735569678349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$main.coverage" NAME="main Coverage Results" MODIFIED="1735569493845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$config.coverage" NAME="config Coverage Results" MODIFIED="1735007383187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
