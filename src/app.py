@@ -109,12 +109,10 @@ def dashboard():
     )
 
 
-
 @app.route('/payment_session_type/<athlete_id>/<training_plan_id>', methods=['GET', 'POST'])
 def payment_session_type(athlete_id, training_plan_id):
     print(f"Attempting to access payment session for athlete_id: {athlete_id}, training_plan_id: {training_plan_id}")
 
-    # Fetch the athlete and training plan based on their IDs
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
     training_plan = TrainingPlan.query.filter_by(training_plan_id=training_plan_id).first()
 
@@ -122,20 +120,20 @@ def payment_session_type(athlete_id, training_plan_id):
         flash("Invalid athlete or training plan.", "error")
         return redirect(url_for('dashboard'))
 
-    # Handle the POST request
     if request.method == 'POST':
-        # Get the session_type from the form
         session_type = request.form.get('session_type')
+        print(f"Received session_type: {session_type}")  # Debug print
+
         if not session_type:
             flash("Session type is required.", "error")
             return render_template('payment_session.html', athlete=athlete, training_plan=training_plan)
 
         # Redirect to the payment method route with the correct parameters
-        return redirect(
-            url_for('payment_method', athlete_id=athlete_id, plan_id=training_plan_id, session_type=session_type)
-        )
+        return redirect(url_for('payment_method',
+                                athlete_id=athlete_id,
+                                plan_id=training_plan_id,
+                                session_type=session_type))
 
-    # Handle the GET request
     return render_template('payment_session.html', athlete=athlete, training_plan=training_plan)
 
 @app.route('/payment_method/<athlete_id>/<plan_id>/<session_type>', methods=['GET', 'POST'])
@@ -211,6 +209,7 @@ def payment_method(athlete_id, plan_id, session_type):
     except Exception as e:
         flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for('dashboard'))
+
 
 @app.route('/register_competition/<athlete_id>/<competition_id>', methods=['GET', 'POST'])
 def register_competition(athlete_id, competition_id):
