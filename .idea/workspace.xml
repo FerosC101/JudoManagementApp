@@ -7,7 +7,6 @@
     <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="modify designs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/guest_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/guest_view.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +156,8 @@
       <workItem from="1736165446347" duration="6124000" />
       <workItem from="1736212822346" duration="7400000" />
       <workItem from="1736223721093" duration="1149000" />
-      <workItem from="1736231155057" duration="6571000" />
+      <workItem from="1736231155057" duration="6776000" />
+      <workItem from="1736247864775" duration="6189000" />
     </task>
     <task id="LOCAL-00001" summary="c">
       <option name="closed" value="true" />
@@ -455,7 +455,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736232477243</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="modify designs">
+      <option name="closed" value="true" />
+      <created>1736238716225</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1736238716225</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -490,7 +498,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="modify designs" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1736231343016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/JudoManagementApp$app.coverage" NAME="app Coverage Results" MODIFIED="1736251566353" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$.coverage" NAME=" Coverage Results" MODIFIED="1735569678349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tests" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$main.coverage" NAME="main Coverage Results" MODIFIED="1735569493845" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/JudoManagementApp$config.coverage" NAME="config Coverage Results" MODIFIED="1735007383187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />

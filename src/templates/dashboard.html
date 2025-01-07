@@ -95,10 +95,14 @@
         }
 
         .card {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             flex: 0 0 auto;
             width: 220px;
             height: 180px;
             background: #3c3c3c;
+            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -107,6 +111,7 @@
             font-size: 1.5rem;
             color: #f5f5dc;
             cursor: pointer;
+            position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -123,7 +128,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 999;
         }
 
@@ -137,29 +142,45 @@
             border-radius: 8px;
             z-index: 1000;
             width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
         }
 
         .modal-header {
             padding: 20px;
-            border-bottom: 2px solid #4a4a4a;
-            font-size: 1.8rem;
             color: #ffca28;
             background: #3c3c3c;
+            border-bottom: 1px solid #4a4a4a;
             border-radius: 8px 8px 0 0;
+            font-size: 1.8rem;
         }
 
         .modal-content {
             padding: 20px;
             overflow-y: auto;
-            flex: 1;
+            max-height: calc(80vh - 130px); /* Adjust for header and close button */
+            background: #3c3c3c;
+            color: #f5f5dc;
+            font-size: 1.2rem;
+            line-height: 2;
         }
 
         .modal-content strong {
             color: #ffca28;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #2c2c2c;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
         }
 
         .modal::-webkit-scrollbar {
@@ -180,17 +201,76 @@
             background: #d4a019;
         }
 
-        /* Athlete Section */
-        .athlete-section {
-            padding: 20px;
-            background: #3c3c3c;
-            border-radius: 8px;
+        .profile-info {
+            margin-bottom: 20px;
         }
 
-        /* Remove these properties from .athlete-section */
+        .profile-info h3 {
+            color: #f5f5dc;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .profile-info p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .profile-info strong {
+            color: #ffca28;
+            margin-right: 8px;
+        }
+
+        /* Training Plans Section */
+        .training-plans {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #4a4a4a;
+        }
+
+        .training-plans h3 {
+            color: #f5f5dc;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .plan-details {
+            background: #2c2c2c;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .plan-details h4 {
+            color: #ffca28;
+            margin-bottom: 10px;
+        }
+
+        .plan-details p {
+            margin: 5px 0;
+        }
+
+
+        /* Athlete Section */
         .athlete-section {
             max-height: none;
             overflow-y: visible;
+        }
+
+        .athlete-section h3 {
+            color: #f5f5dc;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .athlete-section p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .athlete-section strong {
+            color: #ffca28;
+            margin-right: 8px;
         }
 
         .athlete-section::-webkit-scrollbar {
@@ -213,14 +293,28 @@
 
         .athlete-subscriptions,
         .athlete-competitions {
-            margin-top: 20px;
+             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #5a5a5a;
+            border-top: 1px solid #4a4a4a;
+        }
+
+        .competition-details button.modal-close {
+            margin: 10px auto;
+        }
+
+        .competition-details h3 {
+            color: #ffca28;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .competition-details p {
+            margin: 10px 0;
+            line-height: 1.5;
         }
 
         /* Buttons */
-        .modal-button,
-        .modal-close {
+        .modal-button {
             display: block;
             width: 100%;
             padding: 12px 20px;
@@ -236,28 +330,43 @@
             font-size: 1rem;
         }
 
-        .modal-button:hover,
-        .modal-close:hover {
+        .modal-close {
+            display: block;
+            background: #ffca28;
+            border: none;
+            color: #2c2c2c;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px auto;
+            width: 150px;
+            text-align: center;
+        }
+
+
+        .modal-button:hover {
             background: #d4a019;
             transform: scale(1.02);
+        }
+        .modal-close:hover {
+            background: #ffd54f;
         }
 
         .cancel-button {
             background: #ff4444;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px;
+            width: 100%;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 15px;
             font-weight: bold;
+            margin-top: 10px;
         }
 
         .cancel-button:hover {
-            background: #cc0000;
-            transform: scale(1.02);
+            background: #ff0000;
         }
 
         /* Confirmation Dialog */
@@ -318,17 +427,16 @@
 
         /* Subscription Cards */
         .subscription-card {
-            background: #3c3c3c;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-            border: 1px solid #4a4a4a;
+            background: #2c2c2c;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
 
         .subscription-card h3,
         .subscription-card h4 {
             color: #ffca28;
-            margin: 0 0 15px 0;
+            margin-bottom: 10px;
         }
 
         .subscription-card p {
@@ -401,6 +509,19 @@
             display: block;
         }
 
+        .modal-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #2c2c2c;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
         /* Status Labels */
         .status-active {
             color: #4CAF50;
@@ -451,9 +572,9 @@
                     <h3>${card.dataset.competitionName}</h3>
                     <p><strong>Location:</strong> ${card.dataset.location}</p>
                     <p><strong>Date:</strong> ${card.dataset.date}</p>
-                    <p><strong>Competition Fee:</strong> $${card.dataset.entryFee}</p>
+                    <p><strong>Competition Fee:</strong> ₱${card.dataset.entryFee}</p>
                     <p><strong>Category:</strong> ${card.dataset.category}</p>
-                    <button onclick="registerForCompetition('${registerUrl}')" class="modal-button">
+                    <button onclick="registerForCompetition('${registerUrl}')" class="modal-close">
                         Register for Competition
                     </button>
                 </div>`;
@@ -673,7 +794,7 @@
                                 <p><strong>Date:</strong> ${comp.date}</p>
                                 <p><strong>Location:</strong> ${comp.location}</p>
                                 <p><strong>Category:</strong> ${comp.weight_category}</p>
-                                <p><strong>Entry Fee:</strong> $${comp.entry_fee}</p>
+                                <p><strong>Entry Fee:</strong> ₱${comp.entry_fee}</p>
                                 <p><strong>Registered:</strong> ${comp.registration_date}</p>
                             </div>
                         `).join('')}
@@ -732,7 +853,7 @@
                                     <td>${payment.payment_date}</td>
                                     <td>${payment.plan_name}</td>
                                     <td>${payment.plan_type}</td>
-                                    <td>$${payment.amount}</td>
+                                    <td>₱${payment.amount}</td>
                                     <td>${payment.payment_method}</td>
                                 </tr>
                             `).join('')}
@@ -745,9 +866,9 @@
                             <h3>${training.plan_name}</h3>
                             <p><strong>Started:</strong> ${training.start_date}</p>
                             <p><strong>Category:</strong> ${training.category}</p>
-                            <p><strong>Monthly Fee:</strong> $${training.monthly_fee}</p>
-                            ${training.weekly_fee ? `<p><strong>Weekly Fee:</strong> $${training.weekly_fee}</p>` : ''}
-                            ${training.private_hourly_fee ? `<p><strong>Private Hour:</strong> $${training.private_hourly_fee}</p>` : ''}
+                            <p><strong>Monthly Fee:</strong> ₱${training.monthly_fee}</p>
+                            ${training.weekly_fee ? `<p><strong>Weekly Fee:</strong> ₱${training.weekly_fee}</p>` : ''}
+                            ${training.private_hourly_fee ? `<p><strong>Private Hour:</strong> ₱${training.private_hourly_fee}</p>` : ''}
                             <button
                                 class="cancel-button"
                                 onclick="cancelTraining(${training.id})">
@@ -796,9 +917,9 @@
             {% for plan in plans %}
                 <div class="card" onclick="showDetails('{{ plan.plan_name }}',
                     '<strong>Description:</strong> {{ plan.description }}<br>' +
-                    '<strong>Monthly Fee:</strong> ${{ plan.monthly_fee }}<br>' +
-                    '<strong>Weekly Fee:</strong> ${{ plan.weekly_fee }}<br>' +
-                    '<strong>Private Hourly Fee:</strong> ${{ plan.private_hourly_fee }}<br>' +
+                    '<strong>Monthly Fee:</strong> ₱{{ plan.monthly_fee }}<br>' +
+                    '<strong>Weekly Fee:</strong> ₱{{ plan.weekly_fee }}<br>' +
+                    '<strong>Private Hourly Fee:</strong> ₱{{ plan.private_hourly_fee }}<br>' +
                     '<strong>Category:</strong> {{ plan.category }}<br>' +
                     '<strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>' +
                     '<button ' +

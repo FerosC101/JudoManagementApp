@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Guest Dashboard</title>
     <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -12,6 +19,7 @@
             color: #f5f5dc;
         }
 
+        /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -24,33 +32,70 @@
 
         .navbar h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             color: #ffca28;
         }
 
+        .menu {
+            position: relative;
+        }
+
+        .menu-icon {
+            cursor: pointer;
+            font-size: 2rem;
+            color: #ffca28;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #3c3c3c;
+            border: 1px solid #5a5a5a;
+            border-radius: 5px;
+            margin-top: 10px;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        .dropdown a {
+            display: block;
+            text-decoration: none;
+            color: #f5f5dc;
+            padding: 5px;
+        }
+
+        .dropdown a:hover {
+            background: #ffca28;
+            color: #2c2c2c;
+        }
+
+        /* Section */
         .section {
-            margin: 20px;
+            margin: 30px;
+            padding: 0;
         }
 
         .section h2 {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
             color: #ffca28;
         }
 
+        /* Scrollable Cards */
         .scroll-container {
             display: flex;
-            gap: 10px;
+            gap: 20px;
             overflow-x: auto;
             padding: 10px 0;
         }
 
         .card {
             flex: 0 0 auto;
-            width: 150px;
-            height: 120px;
+            width: 220px;
+            height: 180px;
             background: #3c3c3c;
-            border: 1px solid #5a5a5a;
+            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -59,7 +104,6 @@
             font-size: 1.5rem;
             color: #f5f5dc;
             cursor: pointer;
-            position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -68,6 +112,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -75,67 +120,82 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 999;
         }
 
         .modal {
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: #3c3c3c;
             border-radius: 8px;
-            width: 500px; /* Fixed width */
-            min-height: 200px; /* Minimum height */
-            padding: 20px;
-            color: #f5f5dc;
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
         }
 
         .modal-header {
+            padding: 20px;
             color: #ffca28;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            background: #3c3c3c;
             border-bottom: 1px solid #4a4a4a;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.8rem;
         }
 
         .modal-content {
+            padding: 20px;
+            background: #3c3c3c;
+            color: #f5f5dc;
             font-size: 1.2rem;
+            line-height: 2;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
-        .modal p {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-
-        .modal strong {
+        .modal-content strong {
             color: #ffca28;
-            margin-right: 8px;
         }
 
-        /* Button styling */
         .modal-close {
             display: block;
-            width: 100%;
-            padding: 10px;
-            margin-top: 20px;
             background: #ffca28;
-            color: #2c2c2c;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            color: #2c2c2c;
             font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px auto;
+            width: 150px;
         }
 
         .modal-close:hover {
-            background: #d4a019;
+            background: #ffd54f;
         }
     </style>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuIcon = document.querySelector('.menu-icon');
+            const dropdown = document.querySelector('.dropdown');
+
+            menuIcon.addEventListener('click', () => {
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!menuIcon.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        });
+
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-content').innerText = content;
+            document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-overlay').style.display = 'block';
             document.getElementById('modal').style.display = 'block';
         }
@@ -144,54 +204,89 @@
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('modal').style.display = 'none';
         }
+
+        function showCompetitionDetails(card) {
+            const details = `
+                <div class="competition-details">
+                    <h3>${card.dataset.competitionName}</h3>
+                    <p><strong>Location:</strong> ${card.dataset.location}</p>
+                    <p><strong>Date:</strong> ${card.dataset.date}</p>
+                    <p><strong>Competition Fee:</strong> ₱${card.dataset.entryFee}</p>
+                    <p><strong>Category:</strong> ${card.dataset.category}</p>
+                    <p><em>Please log in to register for competitions.</em></p>
+                </div>`;
+
+            showDetails(card.dataset.competitionName, details);
+        }
     </script>
 </head>
 <body>
     <div class="navbar">
         <h1>Judo</h1>
+        <div class="menu">
+            <span class="menu-icon">☰</span>
+            <div class="dropdown">
+                <a href="{{ url_for('login') }}">Logout</a>
+            </div>
+        </div>
     </div>
 
-    <!-- Athletes Section -->
     <div class="section" id="athletes">
         <h2>Athletes</h2>
         <div class="scroll-container">
             {% for athlete in athletes %}
-            <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}', 'ID: {{ athlete.athlete_id }} | Age: {{ athlete.age }} | Weight: {{ athlete.current_weight }} kg | Category: {{ athlete.weight_category }}')">
-                A
-            </div>
+                <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}', `
+                    <strong>Age:</strong> {{ athlete.age }}<br>
+                    <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
+                    <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>
+                    <p><em>Please log in to see more athlete details.</em></p>
+                `)">
+                    {{ athlete.name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Plans Section -->
     <div class="section" id="plans">
         <h2>Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
-            <div class="card" onclick="showDetails('Plan: {{ plan.title }}', 'Description: {{ plan.description }} | Start: {{ plan.start_date }} | End: {{ plan.end_date }}')">
-                P
-            </div>
+                <div class="card" onclick="showDetails('{{ plan.plan_name }}',
+                    '<strong>Description:</strong> {{ plan.description }}<br>' +
+                    '<strong>Monthly Fee:</strong> ₱{{ plan.monthly_fee }}<br>' +
+                    '<strong>Weekly Fee:</strong> ₱{{ plan.weekly_fee }}<br>' +
+                    '<strong>Private Hourly Fee:</strong> ₱{{ plan.private_hourly_fee }}<br>' +
+                    '<strong>Category:</strong> {{ plan.category }}<br>' +
+                    '<strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>' +
+                    '<p><em>Please log in to register for training plans.</em></p>'
+                )">
+                    {{ plan.plan_name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Competitions Section -->
     <div class="section" id="competitions">
         <h2>Competitions</h2>
         <div class="scroll-container">
             {% for competition in competitions %}
-            <div class="card" onclick="showDetails('Competition: {{ competition.name }}', 'Location: {{ competition.location }} | Date: {{ competition.date }} | Participants: {{ competition.participants }}')">
-                C
-            </div>
+                <div class="card"
+                    data-competition-name="{{ competition.competition_name }}"
+                    data-location="{{ competition.location }}"
+                    data-date="{{ competition.date }}"
+                    data-entry-fee="{{ competition.entry_fee }}"
+                    data-category="{{ competition.weight_category }}"
+                    onclick="showCompetitionDetails(this)">
+                    {{ competition.competition_name[0] }}
+                </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
-    <div class="modal" id="modal">
-        <div class="modal-header" id="modal-title"></div>
-        <div class="modal-content" id="modal-content"></div>
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
+    <div id="modal" class="modal">
+        <div id="modal-title" class="modal-header"></div>
+        <div id="modal-content" class="modal-content"></div>
         <button class="modal-close" onclick="closeModal()">Close</button>
     </div>
 </body>
