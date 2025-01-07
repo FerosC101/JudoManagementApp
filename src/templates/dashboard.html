@@ -128,31 +128,28 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: #3c3c3c;
-            padding: 20px;
             border-radius: 8px;
             z-index: 1000;
-            max-width: 500px;
             width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid #4a4a4a;
             font-size: 1.8rem;
             color: #ffca28;
-            margin-bottom: 15px;
-            text-align: center;
-            position: sticky;
-            top: 0;
             background: #3c3c3c;
-            padding: 10px 0;
-            border-bottom: 2px solid #4a4a4a;
+            border-radius: 8px 8px 0 0;
         }
 
         .modal-content {
-            font-size: 1.2rem;
-            line-height: 1.5;
-            padding: 0 10px;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .modal-content strong {
@@ -179,12 +176,15 @@
 
         /* Athlete Section */
         .athlete-section {
+            padding: 20px;
             background: #3c3c3c;
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            max-height: 70vh;
-            overflow-y: auto;
+        }
+
+        /* Remove these properties from .athlete-section */
+        .athlete-section {
+            max-height: none;
+            overflow-y: visible;
         }
 
         .athlete-section::-webkit-scrollbar {
@@ -255,6 +255,7 @@
         }
 
         /* Confirmation Dialog */
+
         .confirm-dialog {
             position: fixed;
             top: 50%;
@@ -263,7 +264,7 @@
             background: #3c3c3c;
             padding: 25px;
             border-radius: 8px;
-            z-index: 1100;
+            z-index: 1002;
             width: 90%;
             max-width: 400px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -280,8 +281,13 @@
             margin-top: 20px;
         }
 
-        .dialog-buttons button {
+        .dialog-buttons button,
+        .dialog-buttons form {
             flex: 1;
+        }
+
+        .dialog-buttons button {
+            width: 100%;
             padding: 10px;
             border: none;
             border-radius: 4px;
@@ -506,8 +512,7 @@
             if (modal) modal.style.display = 'none';
         }
 
-        function cancelTraining(trainingId) {
-            // Create confirmation dialog
+                function cancelTraining(trainingId) {
             const dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
             dialog.innerHTML = `
@@ -515,13 +520,16 @@
                 <p>Are you sure you want to cancel this training plan?</p>
                 <div class="dialog-buttons">
                     <button class="cancel-btn" onclick="closeDialog(this.parentElement.parentElement)">No, Keep Plan</button>
-                    <button class="confirm-btn" onclick="confirmCancelTraining(${trainingId}, this.parentElement.parentElement)">Yes, Cancel Plan</button>
+                    <form method="POST" action="/cancel_training/${trainingId}" style="display: inline;">
+                        <button type="submit" class="confirm-btn">Yes, Cancel Plan</button>
+                    </form>
                 </div>
             `;
 
             // Add overlay
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
+            overlay.style.zIndex = '1001'; // Higher than regular modal
             document.body.appendChild(overlay);
             document.body.appendChild(dialog);
         }

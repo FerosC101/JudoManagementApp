@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from src.extension import db
 from src.model import User, Athlete, TrainingPlan, Competition, AthleteTraining, Payment, AthleteCompetition
 import datetime
@@ -279,6 +279,37 @@ def register_competition(athlete_id, competition_id):
 
     flash("You must be enrolled in an intermediate or elite plan to register for competitions.", "error")
     return redirect(url_for('dashboard'))
+
+
+@app.route('/cancel_training/<int:training_id>', methods=['POST'])
+def cancel_training(training_id):
+    # Check if it's an AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    athlete_training = AthleteTraining.query.filter_by(id=training_id).first()
+
+    if not athlete_training:
+        if is_ajax:
+            return jsonify({'success': False, 'message': 'Training plan not found'}), 404
+        flash('Training plan not found.', 'error')
+        return redirect(url_for('dashboard'))
+
+    try:
+        db.session.delete(athlete_training)
+        db.session.commit()
+
+        if is_ajax:
+            return jsonify({'success': True, 'message': 'Training plan cancelled successfully'})
+        flash('Training plan cancelled successfully.', 'success')
+        return redirect(url_for('dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        if is_ajax:
+            return jsonify({'success': False, 'message': str(e)}), 500
+        flash(f'Error cancelling training plan: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
