@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -12,6 +13,7 @@
             color: #f5f5dc;
         }
 
+        /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -66,6 +68,7 @@
             display: block;
         }
 
+        /* Section */
         .section {
             margin: 30px;
             padding: 0;
@@ -77,6 +80,7 @@
             color: #ffca28;
         }
 
+        /* Scrollable Cards */
         .scroll-container {
             display: flex;
             gap: 20px;
@@ -85,14 +89,10 @@
         }
 
         .card {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
             flex: 0 0 auto;
             width: 220px;
             height: 180px;
             background: #3c3c3c;
-            border: none;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -101,7 +101,6 @@
             font-size: 1.5rem;
             color: #f5f5dc;
             cursor: pointer;
-            position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -110,6 +109,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -128,13 +128,13 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: #3c3c3c;
-            color: #f5f5dc;
             padding: 20px;
-            border-radius: 10px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
             z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .modal-header {
@@ -142,52 +142,260 @@
             color: #ffca28;
             margin-bottom: 15px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            background: #3c3c3c;
+            padding: 10px 0;
+            border-bottom: 2px solid #4a4a4a;
         }
 
         .modal-content {
             font-size: 1.2rem;
             line-height: 1.5;
+            padding: 0 10px;
         }
 
         .modal-content strong {
             color: #ffca28;
         }
 
+        .modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal::-webkit-scrollbar-track {
+            background: #2c2c2c;
+            border-radius: 4px;
+        }
+
+        .modal::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
+        .modal::-webkit-scrollbar-thumb:hover {
+            background: #d4a019;
+        }
+
+        /* Athlete Section */
+        .athlete-section {
+            background: #3c3c3c;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .athlete-section::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .athlete-section::-webkit-scrollbar-track {
+            background: #2c2c2c;
+            border-radius: 4px;
+        }
+
+        .athlete-section::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
+        .athlete-section::-webkit-scrollbar-thumb:hover {
+            background: #d4a019;
+        }
+
+        .athlete-subscriptions,
+        .athlete-competitions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #5a5a5a;
+        }
+
+        /* Buttons */
+        .modal-button,
         .modal-close {
             display: block;
+            width: 100%;
+            padding: 12px 20px;
             background: #ffca28;
-            border: none;
             color: #2c2c2c;
+            border: none;
+            border-radius: 4px;
             font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 5px;
+            margin-top: 15px;
             cursor: pointer;
-            margin: 20px auto 0;
-            width: 150px;
+            transition: all 0.3s ease;
             text-align: center;
+            font-size: 1rem;
         }
 
+        .modal-button:hover,
         .modal-close:hover {
             background: #d4a019;
+            transform: scale(1.02);
         }
 
-        .register-button {
-            display: block;
-            background: #ffca28;
+        .cancel-button {
+            background: #ff4444;
+            color: white;
             border: none;
-            color: #2c2c2c;
-            font-weight: bold;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            margin: 20px auto 0;
-            width: 150px;
-            text-align: center;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+            font-weight: bold;
         }
 
-        .register-button:hover {
-            background: #d4a019;
-            transform: scale(1.05);
+        .cancel-button:hover {
+            background: #cc0000;
+            transform: scale(1.02);
+        }
+
+        /* Confirmation Dialog */
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #3c3c3c;
+            padding: 25px;
+            border-radius: 8px;
+            z-index: 1100;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .confirm-dialog h3 {
+            color: #ffca28;
+            margin: 0 0 15px 0;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .dialog-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .dialog-buttons .cancel-btn {
+            background: #4a4a4a;
+            color: white;
+        }
+
+        .dialog-buttons .confirm-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .dialog-buttons button:hover {
+            transform: scale(1.02);
+        }
+
+        /* Subscription Cards */
+        .subscription-card {
+            background: #3c3c3c;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #4a4a4a;
+        }
+
+        .subscription-card h3,
+        .subscription-card h4 {
+            color: #ffca28;
+            margin: 0 0 15px 0;
+        }
+
+        .subscription-card p {
+            margin: 8px 0;
+        }
+
+        /* Payment History */
+        .payment-history {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .payment-history th,
+        .payment-history td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #4a4a4a;
+        }
+
+        .payment-history th {
+            background-color: #3c3c3c;
+            color: #ffca28;
+            font-weight: bold;
+        }
+
+        .payment-history tr:hover {
+            background-color: #3c3c3c;
+        }
+
+        /* Modal Tabs */
+        .modal-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4a4a4a;
+            padding-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: #3c3c3c;
+            z-index: 1;
+        }
+
+        .modal-tab {
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #f5f5dc;
+            font-size: 1.1rem;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-tab:hover {
+            background: #4a4a4a;
+        }
+
+        .modal-tab.active {
+            color: #ffca28;
+            background: #3c3c3c;
+            border-bottom: 2px solid #ffca28;
+        }
+
+        .modal-content-section {
+            display: none;
+        }
+
+        .modal-content-section.active {
+            display: block;
+        }
+
+        /* Status Labels */
+        .status-active {
+            color: #4CAF50;
+        }
+
+        .status-completed {
+            color: #9E9E9E;
         }
     </style>
     <script>
@@ -226,27 +434,318 @@
 
         function showCompetitionDetails(card) {
             const registerUrl = card.dataset.registerUrl;
-            const details = `Competition: ${card.dataset.competitionName}<br>
-                <strong>Location:</strong> ${card.dataset.location}<br>
-                <strong>Date:</strong> ${card.dataset.date}<br>
-                <strong>Competition Fee:</strong> ${card.dataset.entryFee}<br>
-                <strong>Category:</strong> ${card.dataset.category}<br>
-                <a href="${registerUrl}" class="register-button">Register</a>`;
+            const details = `
+                <div class="competition-details">
+                    <h3>${card.dataset.competitionName}</h3>
+                    <p><strong>Location:</strong> ${card.dataset.location}</p>
+                    <p><strong>Date:</strong> ${card.dataset.date}</p>
+                    <p><strong>Competition Fee:</strong> $${card.dataset.entryFee}</p>
+                    <p><strong>Category:</strong> ${card.dataset.category}</p>
+                    <button onclick="registerForCompetition('${registerUrl}')" class="modal-button">
+                        Register for Competition
+                    </button>
+                </div>`;
 
             showDetails(card.dataset.competitionName, details);
         }
+
+        function registerForCompetition(url) {
+            window.location.href = url;
+        }
+
 
         function showDetails(title, content) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-overlay').style.display = 'block';
             document.getElementById('modal').style.display = 'block';
+
+            // Add scroll buttons
+
+            const modal = document.getElementById('modal');
+            checkScrollButtons(modal);
+
+            modal.addEventListener('scroll', () => checkScrollButtons(modal));
         }
 
-        function closeModal() {
-            document.getElementById('modal-overlay').style.display = 'none';
-            document.getElementById('modal').style.display = 'none';
+        function scrollModal(direction) {
+            const modal = document.getElementById('modal');
+            const scrollAmount = 300; // Adjust scroll amount as needed
+
+            if (direction === 'up') {
+                modal.scrollBy({
+                    top: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                modal.scrollBy({
+                    top: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
+
+        function checkScrollButtons(modal) {
+            const scrollButtons = modal.querySelector('.scroll-buttons');
+            if (!scrollButtons) return;
+
+            const hasScroll = modal.scrollHeight > modal.clientHeight;
+            scrollButtons.classList.toggle('hidden', !hasScroll);
+
+            // Position the buttons based on modal position
+            const modalRect = modal.getBoundingClientRect();
+            scrollButtons.style.top = `${modalRect.top + 20}px`;
+            scrollButtons.style.height = `${modalRect.height - 40}px`; // Account for padding
+        }
+
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modal = document.getElementById('modal');
+            if (modalOverlay) modalOverlay.style.display = 'none';
+            if (modal) modal.style.display = 'none';
+        }
+
+        function cancelTraining(trainingId) {
+            // Create confirmation dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'confirm-dialog';
+            dialog.innerHTML = `
+                <h3>Cancel Training Plan</h3>
+                <p>Are you sure you want to cancel this training plan?</p>
+                <div class="dialog-buttons">
+                    <button class="cancel-btn" onclick="closeDialog(this.parentElement.parentElement)">No, Keep Plan</button>
+                    <button class="confirm-btn" onclick="confirmCancelTraining(${trainingId}, this.parentElement.parentElement)">Yes, Cancel Plan</button>
+                </div>
+            `;
+
+            // Add overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            document.body.appendChild(overlay);
+            document.body.appendChild(dialog);
+        }
+
+        function closeDialog(dialog) {
+            dialog.remove();
+            const overlay = document.querySelector('.modal-overlay');
+            if (overlay) overlay.remove();
+        }
+
+        function confirmCancelTraining(trainingId, dialog) {
+            fetch(`/cancel_training/${trainingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'  // Add this header
+                },
+                credentials: 'same-origin'  // Add this to ensure cookies are sent
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Remove the plan card from the display
+                    const planCard = document.querySelector(`[data-training-id="${trainingId}"]`);
+                    if (planCard) {
+                        planCard.remove();
+                    }
+
+                    // Close the modal and refresh the athlete details
+                    closeModal();
+                    showAthleteDetails();
+                } else {
+                    throw new Error(data.message || 'Failed to cancel training plan');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to cancel training plan. Please try again.');
+            })
+            .finally(() => {
+                closeDialog(dialog);
+            });
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.modal-tab');
+            const sections = document.querySelectorAll('.modal-content-section');
+
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('onclick').includes(tabName)) {
+                    tab.classList.add('active');
+                }
+            });
+
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === `${tabName}-section`) {
+                    section.classList.add('active');
+                }
+            });
+        }
+
+        function showAthleteDetails() {
+            const athleteData = {
+                name: "{{ athlete.name }}",
+                age: {{ athlete.age }},
+                current_weight: {{ athlete.current_weight }},
+                weight_category: "{{ athlete.weight_category }}",
+                athlete_id: "{{ athlete.athlete_id }}",
+                trainings: [
+                    {% for training in athlete.athlete_trainings %}
+                    {
+                        id: {{ training.id }},
+                        plan_name: "{{ training.training_plan.plan_name }}",
+                        start_date: "{{ training.start_date }}",
+                        end_date: {% if training.end_date %}"{{ training.end_date }}"{% else %}null{% endif %},
+                        category: "{{ training.training_plan.category }}",
+                        session_per_week: {{ training.training_plan.session_per_week }}
+                    }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                competitions: [
+                    {% for comp in athlete.athlete_competitions %}
+                    {
+                        competition_name: "{{ comp.competition.competition_name }}",
+                        date: "{{ comp.competition.date }}",
+                        location: "{{ comp.competition.location }}",
+                        weight_category: "{{ comp.competition.weight_category }}",
+                        entry_fee: {{ comp.competition.entry_fee }},
+                        registration_date: "{{ comp.registration_date }}"
+                    }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            };
+
+            const content = `
+                <div class="athlete-section">
+                    <h3>Profile Information</h3>
+                    <p><strong>Name:</strong> ${athleteData.name}</p>
+                    <p><strong>Age:</strong> ${athleteData.age}</p>
+                    <p><strong>Weight:</strong> ${athleteData.current_weight} kg</p>
+                    <p><strong>Category:</strong> ${athleteData.weight_category}</p>
+                    <p><strong>Athlete ID:</strong> ${athleteData.athlete_id}</p>
+
+                    <div class="athlete-subscriptions">
+                        <h3>Active Training Plans</h3>
+                        ${athleteData.trainings
+                            .filter(training => !training.end_date)
+                            .map(training => `
+                                <div class="subscription-card">
+                                    <h4>${training.plan_name}</h4>
+                                    <p><strong>Started:</strong> ${training.start_date}</p>
+                                    <p><strong>Category:</strong> ${training.category}</p>
+                                    <p><strong>Sessions/Week:</strong> ${training.session_per_week}</p>
+                                    <button
+                                        class="cancel-button"
+                                        onclick="cancelTraining(${training.id})">
+                                        Cancel Training Plan
+                                    </button>
+                                </div>
+                            `).join('')}
+                    </div>
+
+                    <div class="athlete-competitions">
+                        <h3>Registered Competitions</h3>
+                        ${athleteData.competitions.map(comp => `
+                            <div class="competition-card">
+                                <h4>${comp.competition_name}</h4>
+                                <p><strong>Date:</strong> ${comp.date}</p>
+                                <p><strong>Location:</strong> ${comp.location}</p>
+                                <p><strong>Category:</strong> ${comp.weight_category}</p>
+                                <p><strong>Entry Fee:</strong> $${comp.entry_fee}</p>
+                                <p><strong>Registered:</strong> ${comp.registration_date}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+
+            showDetails('Athlete Details', content);
+        }
+
+        function showPaymentHistory() {
+            const payments = [
+                {% for payment in athlete.athlete_payments %}
+                {
+                    payment_date: "{{ payment.payment_date }}",
+                    plan_name: "{{ payment.training_plan.plan_name }}",
+                    plan_type: "{{ payment.plan_type }}",
+                    amount: {{ payment.amount }},
+                    payment_method: "{{ payment.payment_method }}"
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const trainings = [
+                {% for training in athlete.athlete_trainings if not training.end_date %}
+                {
+                    id: {{ training.id }},
+                    plan_name: "{{ training.training_plan.plan_name }}",
+                    start_date: "{{ training.start_date }}",
+                    category: "{{ training.training_plan.category }}",
+                    monthly_fee: {{ training.training_plan.monthly_fee }},
+                    weekly_fee: {% if training.training_plan.weekly_fee %}{{ training.training_plan.weekly_fee }}{% else %}null{% endif %},
+                    private_hourly_fee: {% if training.training_plan.private_hourly_fee %}{{ training.training_plan.private_hourly_fee }}{% else %}null{% endif %}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const content = `
+                <div class="modal-tabs">
+                    <button class="modal-tab active" onclick="switchTab('payments')">Payment History</button>
+                    <button class="modal-tab" onclick="switchTab('subscriptions')">Active Plans</button>
+                </div>
+                <div id="payments-section" class="modal-content-section active">
+                    <table class="payment-history">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Plan</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${payments.map(payment => `
+                                <tr>
+                                    <td>${payment.payment_date}</td>
+                                    <td>${payment.plan_name}</td>
+                                    <td>${payment.plan_type}</td>
+                                    <td>$${payment.amount}</td>
+                                    <td>${payment.payment_method}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div id="subscriptions-section" class="modal-content-section">
+                    ${trainings.map(training => `
+                        <div class="subscription-card">
+                            <h3>${training.plan_name}</h3>
+                            <p><strong>Started:</strong> ${training.start_date}</p>
+                            <p><strong>Category:</strong> ${training.category}</p>
+                            <p><strong>Monthly Fee:</strong> $${training.monthly_fee}</p>
+                            ${training.weekly_fee ? `<p><strong>Weekly Fee:</strong> $${training.weekly_fee}</p>` : ''}
+                            ${training.private_hourly_fee ? `<p><strong>Private Hour:</strong> $${training.private_hourly_fee}</p>` : ''}
+                            <button
+                                class="cancel-button"
+                                onclick="cancelTraining(${training.id})">
+                                Cancel Training Plan
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>`;
+
+            showDetails('Payments & Plans', content);
+        }
+
     </script>
 </head>
 <body>
@@ -255,14 +754,8 @@
         <div class="menu">
             <span class="menu-icon">☰</span>
             <div class="dropdown">
-                <a href="#" onclick="showDetails('Profile', `
-                    <strong>Name:</strong> {{ athlete.name }}<br>
-                    <strong>Age:</strong> {{ athlete.age }}<br>
-                    <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
-                    <strong>Category:</strong> {{ athlete.weight_category }}<br>
-                    <strong>Athlete ID:</strong> {{ athlete.athlete_id }}
-                `);">Profile</a>
-                <a href="#">Payments</a>
+                <a href="#" onclick="showAthleteDetails()">Profile</a>
+                <a href="#" onclick="showPaymentHistory()">Payments</a>
                 <a href="{{ url_for('login') }}">Logout</a>
             </div>
         </div>
