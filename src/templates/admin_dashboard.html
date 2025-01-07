@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #2c2c2c;
+            color: #f5f5dc;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #3c3c3c;
+            color: #ffca28;
+            border-bottom: 2px solid #ffca28;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #ffca28;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .admin-button {
+            background: #ffca28;
+            color: #2c2c2c;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .admin-button:hover {
+            background: #ffd54f;
+            transform: scale(1.05);
+        }
+
+        .section {
+            margin: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: #ffca28;
+        }
+
+        .scroll-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #2c2c2c;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
+        .card {
+            position: relative;
+            flex: 0 0 auto;
+            width: 220px;
+            height: 180px;
+            background: #3c3c3c;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 2.5rem;
+            color: #f5f5dc;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .card-button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .card-button.edit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .card-button.delete {
+            background: #ff4444;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #3c3c3c;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .modal-header {
+            color: #ffca28;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffca28;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #4a4a4a;
+            background: #2c2c2c;
+            color: #f5f5dc;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-button.primary {
+            background: #ffca28;
+            color: #2c2c2c;
+        }
+
+        .modal-button.secondary {
+            background: #4a4a4a;
+            color: #f5f5dc;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Judo Admin</h1>
+        <div class="admin-controls">
+            <a href="/logout" class="admin-button">Logout</a>
+        </div>
+    </div>
+
+    <div class="section" id="athletes">
+        <div class="section-header">
+            <h2>Athletes</h2>
+        </div>
+        <div class="scroll-container">
+            <div class="card">
+                <div class="card-controls">
+                    <button class="card-button delete">×</button>
+                </div>
+                J
+            </div>
+            <div class="card">
+                <div class="card-controls">
+                    <button class="card-button delete">×</button>
+                </div>
+                M
+            </div>
+            <!-- Add more athlete cards as needed -->
+        </div>
+    </div>
+
+    <div class="section" id="plans">
+        <div class="section-header">
+            <h2>Training Plans</h2>
+            <button class="admin-button" onclick="document.getElementById('add-plan-modal').classList.add('show'); document.getElementById('modal-overlay').classList.add('show')">Add Plan</button>
+        </div>
+        <div class="scroll-container">
+            <div class="card">
+                <div class="card-controls">
+                    <button class="card-button edit">✎</button>
+                    <button class="card-button delete">×</button>
+                </div>
+                B
+            </div>
+            <!-- Add more plan cards as needed -->
+        </div>
+    </div>
+
+    <div class="section" id="competitions">
+        <div class="section-header">
+            <h2>Competitions</h2>
+            <button class="admin-button" onclick="document.getElementById('add-competition-modal').classList.add('show'); document.getElementById('modal-overlay').classList.add('show')">Add Competition</button>
+        </div>
+        <div class="scroll-container">
+            <div class="card">
+                <div class="card-controls">
+                    <button class="card-button edit">✎</button>
+                    <button class="card-button delete">×</button>
+                </div>
+                S
+            </div>
+            <!-- Add more competition cards as needed -->
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeAllModals()"></div>
+
+    <!-- Add Plan Modal -->
+    <div class="modal" id="add-plan-modal">
+        <div class="modal-header">Add Training Plan</div>
+        <form>
+            <div class="form-group">
+                <label for="plan_name">Plan Name</label>
+                <input type="text" id="plan_name" name="plan_name" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="monthly_fee">Monthly Fee</label>
+                <input type="number" id="monthly_fee" name="monthly_fee" required>
+            </div>
+            <div class="form-group">
+                <label for="sessions">Sessions per Week</label>
+                <input type="number" id="sessions" name="sessions" required>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="modal-button secondary" onclick="closeAllModals()">Cancel</button>
+                <button type="submit" class="modal-button primary">Add Plan</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Add Competition Modal -->
+    <div class="modal" id="add-competition-modal">
+        <div class="modal-header">Add Competition</div>
+        <form>
+            <div class="form-group">
+                <label for="competition_name">Competition Name</label>
+                <input type="text" id="competition_name" name="competition_name" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+            <div class="form-group">
+                <label for="entry_fee">Entry Fee</label>
+                <input type="number" id="entry_fee" name="entry_fee" required>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="modal-button secondary" onclick="closeAllModals()">Cancel</button>
+                <button type="submit" class="modal-button primary">Add Competition</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function closeAllModals() {
+            document.getElementById('modal-overlay').classList.remove('show');
+            document.getElementById('add-plan-modal').classList.remove('show');
+            document.getElementById('add-competition-modal').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

@@ -15,6 +15,10 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.args.get('guest') == 'true':
+        session['role'] = 'guest'
+        return redirect(url_for('guest_view'))
+
     if request.method == 'POST':
         athlete_id = request.form.get('athlete_id')
 
@@ -318,10 +322,20 @@ def admin_dashboard():
         return redirect(url_for('login'))
     return render_template('admin_dashboard.html')
 
+
 @app.route('/guest_view')
 def guest_view():
+    # Query all necessary data
     athletes = Athlete.query.all()
-    return render_template('guest_view.html', athletes=athletes)
+    plans = TrainingPlan.query.all()
+    competitions = Competition.query.all()
+
+    return render_template(
+        'guest_view.html',
+        athletes=athletes,
+        plans=plans,
+        competitions=competitions
+    )
 
 def get_athlete_by_id(athlete_id):
     athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
