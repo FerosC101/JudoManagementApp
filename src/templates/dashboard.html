@@ -143,7 +143,6 @@
             z-index: 1000;
             width: 90%;
             max-width: 600px;
-            display: flex;
             flex-direction: column;
         }
 
@@ -302,6 +301,10 @@
             margin: 10px auto;
         }
 
+        .competition-details {
+            padding: 20px;
+        }
+
         .competition-details h3 {
             color: #ffca28;
             margin-bottom: 15px;
@@ -311,6 +314,25 @@
         .competition-details p {
             margin: 10px 0;
             line-height: 1.5;
+        }
+
+        .competition-details .modal-button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: #ffca28;
+            color: #2c2c2c;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .competition-details .modal-button:hover {
+            background: #d4a019;
+            transform: scale(1.02);
         }
 
         /* Buttons */
@@ -372,6 +394,7 @@
         /* Confirmation Dialog */
 
         .confirm-dialog {
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -533,6 +556,7 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
             const menuIcon = document.querySelector('.menu-icon');
             const dropdown = document.querySelector('.dropdown');
 
@@ -545,10 +569,68 @@
                     dropdown.style.display = 'none';
                 }
             });
+
+            // Athletes section
+            const athleteCards = document.querySelectorAll('#athletes .card');
+            athleteCards.forEach(card => {
+                card.onclick = function() {
+                    const content = `
+                        <strong>Age:</strong> ${this.getAttribute('data-age')}<br>
+                        <strong>Weight:</strong> ${this.getAttribute('data-weight')} kg<br>
+                        <strong>Weight Category:</strong> ${this.getAttribute('data-category')}<br>
+                    `;
+                    showDetails(`Athlete: ${this.getAttribute('data-name')}`, content);
+                };
+            });
+
+            // Plans section
+            const planCards = document.querySelectorAll('#plans .card');
+            planCards.forEach(card => {
+                card.onclick = function() {
+                    const content = `
+                        <strong>Description:</strong> ${this.getAttribute('data-description')}<br>
+                        <strong>Monthly Fee:</strong> ₱${this.getAttribute('data-monthly-fee')}<br>
+                        <strong>Weekly Fee:</strong> ₱${this.getAttribute('data-weekly-fee')}<br>
+                        <strong>Private Hourly Fee:</strong> ₱${this.getAttribute('data-hourly-fee')}<br>
+                        <strong>Category:</strong> ${this.getAttribute('data-category')}<br>
+                        <strong>Sessions Per Week:</strong> ${this.getAttribute('data-sessions')}<br>
+                        <button
+                            class='modal-button'
+                            data-athlete-id='${this.getAttribute('data-athlete-id')}'
+                            data-plan-id='${this.getAttribute('data-plan-id')}'
+                            onclick='registerForPlan(this); event.stopPropagation();'>
+                            Register for ${this.getAttribute('data-name')}
+                        </button>
+                    `;
+                    showDetails(this.getAttribute('data-name'), content);
+                };
+            });
+
+
+            // Competitions section
+            const competitionCards = document.querySelectorAll('#competitions .card');
+            competitionCards.forEach(card => {
+                card.onclick = function() {
+                    const registerUrl = this.getAttribute('data-register-url');
+                    const content = `
+                        <div class="competition-details">
+                            <h3>${this.getAttribute('data-name')}</h3>
+                            <p><strong>Location:</strong> ${this.getAttribute('data-location')}</p>
+                            <p><strong>Date:</strong> ${this.getAttribute('data-date')}</p>
+                            <p><strong>Competition Fee:</strong> ₱${this.getAttribute('data-entry-fee')}</p>
+                            <p><strong>Category:</strong> ${this.getAttribute('data-category')}</p>
+                            <button onclick="window.location.href='${registerUrl}'" class="modal-button">
+                                Register for Competition
+                            </button>
+                        </div>`;
+                    showDetails('Competition Details', content);
+                };
+            });
         });
 
         function registerForPlan(button) {
             // Close any open modals first
+
             const athleteId = button.getAttribute('data-athlete-id');
             const trainingPlanId = button.getAttribute('data-plan-id');
 
@@ -588,27 +670,46 @@
             window.location.href = url;
         }
 
+
+        // Add error handling to showDetails
         function showDetails(title, content) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-content').innerHTML = content;
-            document.getElementById('modal-overlay').style.display = 'block';
-            document.getElementById('modal').style.display = 'block';
+            try {
+                const modalTitle = document.getElementById('modal-title');
+                const modalContent = document.getElementById('modal-content');
+                const modalOverlay = document.getElementById('modal-overlay');
+                const modal = document.getElementById('modal');
 
-            // Add scroll buttons
-            const modal = document.getElementById('modal');
-            checkScrollButtons(modal);
+                if (!modalTitle || !modalContent || !modalOverlay || !modal) {
+                    console.error('Modal elements not found');
+                    return;
+                }
 
-            modal.addEventListener('scroll', () => checkScrollButtons(modal));
+                modalTitle.textContent = title;
+                modalContent.innerHTML = content; // Set content directly
+                modalOverlay.style.display = 'block';
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('Error showing modal:', error);
+                closeModal();
+            }
         }
+
 
         function scrollModal(direction) {
             const modal = document.getElementById('modal');
             const scrollAmount = 300; // Adjust scroll amount as needed
 
-            modal.scrollBy({
-                top: direction === 'up' ? -scrollAmount : scrollAmount,
-                behavior: 'smooth'
-            });
+            if (direction === 'up') {
+                modal.scrollBy({
+                    top: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                modal.scrollBy({
+                    top: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function checkScrollButtons(modal) {
@@ -624,53 +725,96 @@
             scrollButtons.style.height = `${modalRect.height - 40}px`; // Account for padding
         }
 
+
         function closeModal() {
-            // Close the main modal
-            const modalOverlay = document.getElementById('modal-overlay');
-            const modal = document.getElementById('modal');
-            if (modalOverlay) modalOverlay.style.display = 'none';
-            if (modal) modal.style.display = 'none';
+            const modalElements = [
+                'modal-overlay',
+                'modal',
+                'confirm-dialog'
+            ];
 
-            // Also remove any confirm dialogs that might be open
-            const confirmDialogs = document.querySelectorAll('.confirm-dialog');
-            const extraOverlays = document.querySelectorAll('.modal-overlay');
-
-            confirmDialogs.forEach(dialog => dialog.remove());
-            extraOverlays.forEach(overlay => {
-                if (overlay !== modalOverlay) {
-                    overlay.remove();
+            modalElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
                 }
+            });
+
+            // Also close any dynamically created overlays
+            const extraOverlays = document.querySelectorAll('.modal-overlay');
+            extraOverlays.forEach(overlay => {
+                overlay.style.display = 'none';
             });
         }
 
         function cancelTraining(trainingId) {
-            closeModal();
-            const dialog = document.createElement('div');
-            dialog.className = 'confirm-dialog';
-            dialog.innerHTML = `
-                <h3>Cancel Training Plan</h3>
-                <p>Are you sure you want to cancel this training plan?</p>
-                <div class="dialog-buttons">
-                    <button class="cancel-btn" onclick="closeDialog(this.parentElement.parentElement)">No, Keep Plan</button>
-                    <form method="POST" action="/cancel_training/${trainingId}" style="display: inline;">
-                        <button type="submit" class="confirm-btn">Yes, Cancel Plan</button>
-                    </form>
-                </div>
-            `;
+            // Create form and submit directly
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cancel_training/${trainingId}`;
 
-            // Add overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.style.zIndex = '1001'; // Higher than regular modal
-            document.body.appendChild(overlay);
-            document.body.appendChild(dialog);
+            // Add CSRF token if needed
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrf_token';
+                csrfInput.value = csrfToken.content;
+                form.appendChild(csrfInput);
+            }
+
+            // Append form to body and submit
+            document.body.appendChild(form);
+            form.submit();
         }
 
-        function closeDialog(dialog) {
-            dialog.remove();
+        function closeDialog() {
+            const dialog = document.querySelector('.confirm-dialog');
             const overlay = document.querySelector('.modal-overlay');
+            if (dialog) dialog.remove();
             if (overlay) overlay.remove();
         }
+
+        function confirmCancelTraining(trainingId, dialog) {
+            fetch(`/cancel_training/${trainingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'  // Add this header
+                },
+                credentials: 'same-origin'  // Add this to ensure cookies are sent
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Remove the plan card from the display
+                    const planCard = document.querySelector(`[data-training-id="${trainingId}"]`);
+                    if (planCard) {
+                        planCard.remove();
+                    }
+
+                    // Close the modal and refresh the athlete details
+                    showAthleteDetails();  // Assuming this function will reload the athlete data
+                    window.location.href = '/cancelTRaining'; // Redirect to cancelTRaining page
+                } else {
+                    throw new Error(data.message || 'Failed to cancel training plan');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to cancel training plan. Please try again.');
+            })
+            .finally(() => {
+                closeDialog(dialog);
+            });
+        }
+
+
 
         function switchTab(tabName) {
             const tabs = document.querySelectorAll('.modal-tab');
@@ -692,7 +836,7 @@
         }
 
         function showAthleteDetails() {
-            closeModal();
+            closeModal()
             const athleteData = {
                 name: "{{ athlete.name }}",
                 age: {{ athlete.age }},
@@ -771,6 +915,11 @@
             showDetails('Athlete Details', content);
         }
 
+        function cancelTrainingHandler(trainingId) {
+            cancelTraining(trainingId);
+        }
+
+
         function showPaymentHistory() {
             const payments = [
                 {% for payment in athlete.athlete_payments %}
@@ -784,15 +933,32 @@
                 {% endfor %}
             ];
 
+            const trainings = [
+                {% for training in athlete.athlete_trainings if not training.end_date %}
+                {
+                    id: {{ training.id }},
+                    plan_name: "{{ training.training_plan.plan_name }}",
+                    start_date: "{{ training.start_date }}",
+                    category: "{{ training.training_plan.category }}",
+                    monthly_fee: {{ training.training_plan.monthly_fee }},
+                    weekly_fee: {% if training.training_plan.weekly_fee %}{{ training.training_plan.weekly_fee }}{% else %}null{% endif %},
+                    private_hourly_fee: {% if training.training_plan.private_hourly_fee %}{{ training.training_plan.private_hourly_fee }}{% else %}null{% endif %}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
             const content = `
-                <div class="payment-history-section">
-                    <h3>Payment History</h3>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" onclick="switchTab('payments')">Payment History</button>
+                    <button class="modal-tab" onclick="switchTab('subscriptions')">Active Plans</button>
+                </div>
+                <div id="payments-section" class="modal-content-section active">
                     <table class="payment-history">
                         <thead>
                             <tr>
-                                <th>Payment Date</th>
-                                <th>Plan Name</th>
-                                <th>Plan Type</th>
+                                <th>Date</th>
+                                <th>Plan</th>
+                                <th>Type</th>
                                 <th>Amount</th>
                                 <th>Payment Method</th>
                             </tr>
@@ -809,52 +975,29 @@
                             `).join('')}
                         </tbody>
                     </table>
+                </div>
+                <div id="subscriptions-section" class="modal-content-section">
+                    ${trainings.map(training => `
+                        <div class="subscription-card">
+                            <h3>${training.plan_name}</h3>
+                            <p><strong>Started:</strong> ${training.start_date}</p>
+                            <p><strong>Category:</strong> ${training.category}</p>
+                            <p><strong>Monthly Fee:</strong> ₱${training.monthly_fee}</p>
+                            ${training.weekly_fee ? `<p><strong>Weekly Fee:</strong> ₱${training.weekly_fee}</p>` : ''}
+                            ${training.private_hourly_fee ? `<p><strong>Private Hour:</strong> ₱${training.private_hourly_fee}</p>` : ''}
+                            <button
+                                class="cancel-button"
+                                onclick="cancelTraining(${training.id})">
+                                Cancel Training Plan
+                            </button>
+                        </div>
+                    `).join('')}
                 </div>`;
 
-            showDetails('Payment History', content);
+            showDetails('Payments & Plans', content);
         }
 
-        function showSubscriptions() {
-            const plans = [
-                {% for plan in athlete.training_plans %}
-                {
-                    plan_name: "{{ plan.plan_name }}",
-                    plan_type: "{{ plan.plan_type }}",
-                    amount: {{ plan.amount }},
-                    payment_method: "{{ plan.payment_method }}"
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ];
-
-            const content = `
-                <div class="subscriptions-section">
-                    <h3>Active Subscriptions</h3>
-                    <table class="active-plans">
-                        <thead>
-                            <tr>
-                                <th>Plan Name</th>
-                                <th>Plan Type</th>
-                                <th>Amount</th>
-                                <th>Payment Method</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${plans.map(plan => `
-                                <tr>
-                                    <td>${plan.plan_name}</td>
-                                    <td>${plan.plan_type}</td>
-                                    <td>₱${plan.amount}</td>
-                                    <td>${plan.payment_method}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-
-            showDetails('Subscriptions', content);
-        }
     </script>
-
 </head>
 <body>
     <div class="navbar">
@@ -869,59 +1012,55 @@
         </div>
     </div>
 
+    <!-- Athletes Section -->
     <div class="section" id="athletes">
         <h2>Athletes</h2>
         <div class="scroll-container">
             {% for athlete in athletes %}
-                <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}',
-                    `<strong>Age:</strong> {{ athlete.age }}<br>
-                    <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
-                    <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>`
-                )">
+                <div class="card"
+                    data-name="{{ athlete.name }}"
+                    data-age="{{ athlete.age }}"
+                    data-weight="{{ athlete.current_weight }}"
+                    data-category="{{ athlete.weight_category }}">
                     {{ athlete.name[0] }}
                 </div>
             {% endfor %}
         </div>
     </div>
 
+    <!-- Plans Section -->
     <div class="section" id="plans">
         <h2>Plans</h2>
         <div class="scroll-container">
             {% for plan in plans %}
-                <div class="card" onclick="showDetails('{{ plan.plan_name }}',
-                    `<strong>Description:</strong> {{ plan.description }}<br>
-                    <strong>Monthly Fee:</strong> ₱{{ plan.monthly_fee }}<br>
-                    <strong>Weekly Fee:</strong> ₱{{ plan.weekly_fee }}<br>
-                    <strong>Private Hourly Fee:</strong> ₱{{ plan.private_hourly_fee }}<br>
-                    <strong>Category:</strong> {{ plan.category }}<br>
-                    <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
-                    <button
-                        class='modal-close'
-                        data-athlete-id='{{ athlete_id }}'
-                        data-plan-id='{{ plan.training_plan_id }}'
-                        onclick='registerForPlan(this); event.stopPropagation();'
-                    >
-                        Register for {{ plan.plan_name }}
-                    </button>`
-                )">
+                <div class="card"
+                    data-name="{{ plan.plan_name }}"
+                    data-description="{{ plan.description }}"
+                    data-monthly-fee="{{ plan.monthly_fee }}"
+                    data-weekly-fee="{{ plan.weekly_fee }}"
+                    data-hourly-fee="{{ plan.private_hourly_fee }}"
+                    data-category="{{ plan.category }}"
+                    data-sessions="{{ plan.session_per_week }}"
+                    data-athlete-id="{{ athlete_id }}"
+                    data-plan-id="{{ plan.training_plan_id }}">
                     {{ plan.plan_name[0] }}
                 </div>
             {% endfor %}
         </div>
     </div>
 
+
     <div class="section" id="competitions">
         <h2>Competitions</h2>
         <div class="scroll-container">
             {% for competition in competitions %}
                 <div class="card"
-                    data-competition-name="{{ competition.competition_name }}"
+                    data-name="{{ competition.competition_name }}"
                     data-location="{{ competition.location }}"
                     data-date="{{ competition.date }}"
                     data-entry-fee="{{ competition.entry_fee }}"
                     data-category="{{ competition.weight_category }}"
-                    data-register-url="{{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }}"
-                    onclick="showCompetitionDetails(this)">
+                    data-register-url="{{ url_for('register_competition', athlete_id=athlete_id, competition_id=competition.competition_id) }}">
                     {{ competition.competition_name[0] }}
                 </div>
             {% endfor %}
