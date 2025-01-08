@@ -430,7 +430,7 @@
             {% for plan in plans %}
             <div class="card" data-id="{{ plan.training_plan_id }}">
                 <div class="card-controls">
-                    <button class="card-button edit">✎</button>
+                    <button class="card-button edit" onclick="handleEdit()">✎</button>
                     <button class="card-button delete">×</button>
                 </div>
                 <div class="card-content">
