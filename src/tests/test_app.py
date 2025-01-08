@@ -1,6 +1,6 @@
 import unittest
 from src.app import app,db
-from src.model import Users, Athlete
+from src.model import User, Athlete
 from src.extension import db
 
 

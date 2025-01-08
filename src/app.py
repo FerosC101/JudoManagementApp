@@ -216,22 +216,20 @@ def payment_method(athlete_id, plan_id, session_type):
                 new_training = AthleteTraining(
                     athlete_id=athlete_id,
                     training_plan_id=training_plan.training_plan_id,
-                    start_date=datetime.datetime.utcnow(),
+                    start_date=datetime.utcnow(),
                     end_date=None
                 )
                 db.session.add(new_training)
 
                 db.session.commit()
                 flash("Payment successful and registration completed!", "success")
-                return redirect(url_for('dashboard'))
-
+                return redirect(url_for('dashboard'))  # Successful redirect
             except Exception as e:
+                print(f"Error during payment processing: {str(e)}")  # Log the error
                 db.session.rollback()
                 flash(f"Error processing payment: {str(e)}", "error")
-                return render_template('payment_method.html',
-                                    athlete=athlete,
-                                    training_plan=training_plan,
-                                    session_type=session_type)
+                return redirect(url_for('payment_method', athlete_id=athlete_id, plan_id=training_plan.training_plan_id,
+                                        session_type=session_type))
 
         # GET request - show the payment method form
         return render_template('payment_method.html',
