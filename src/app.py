@@ -3,7 +3,7 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from src.extension import db
 from src.model import User, Athlete, TrainingPlan, Competition, AthleteTraining, Payment, AthleteCompetition
-import datetime
+from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
 app.config.from_object('config.Config')
@@ -276,7 +276,7 @@ def register_competition(athlete_id, competition_id):
                 athlete_competition = AthleteCompetition(
                     athlete_id=athlete_id,
                     competition_id=competition_id,
-                    registration_date=datetime.datetime.utcnow()
+                    registration_date=datetime.utcnow()
                 )
                 db.session.add(athlete_competition)
                 db.session.commit()
@@ -355,9 +355,10 @@ def delete_athlete(athlete_id):
         if not athlete:
             return jsonify({'success': False, 'message': 'Athlete not found'}), 404
 
+        # With cascade delete in models, just delete the athlete
         db.session.delete(athlete)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Athlete deleted successfully'})
+        return jsonify({'success': True, 'message': 'Athlete and all related records deleted successfully'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 400
@@ -367,9 +368,16 @@ def delete_athlete(athlete_id):
 @admin_required
 def add_plan():
     try:
+        # Validate required fields
+        required_fields = ['plan_name', 'monthly_fee', 'weekly_fee', 'private_hourly_fee', 'category', 'session_per_week']
+        for field in required_fields:
+            if field not in request.form:
+                return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
+
+        # Create plan with all fields
         plan = TrainingPlan(
             plan_name=request.form['plan_name'],
-            description=request.form['description'],
+            description=request.form.get('description', ''),  # Optional field
             monthly_fee=float(request.form['monthly_fee']),
             weekly_fee=float(request.form['weekly_fee']),
             private_hourly_fee=float(request.form['private_hourly_fee']),
@@ -378,10 +386,20 @@ def add_plan():
         )
         db.session.add(plan)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Plan added successfully', 'plan': {
-            'id': plan.training_plan_id,
-            'name': plan.plan_name
-        }})
+
+        return jsonify({
+            'success': True,
+            'message': 'Plan added successfully',
+            'plan': {
+                'id': plan.training_plan_id,
+                'name': plan.plan_name,
+                'category': plan.category,
+                'monthly_fee': plan.monthly_fee
+            }
+        })
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Invalid numeric value provided'}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 400
@@ -418,9 +436,10 @@ def delete_plan(training_plan_id):
         if not plan:
             return jsonify({'success': False, 'message': 'Plan not found'}), 404
 
+        # With cascade delete in models, just delete the plan
         db.session.delete(plan)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Plan deleted successfully'})
+        return jsonify({'success': True, 'message': 'Plan and all related records deleted successfully'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 400
@@ -431,24 +450,59 @@ def delete_plan(training_plan_id):
 @admin_required
 def add_competition():
     try:
+        # Validate required fields
+        required_fields = ['competition_name', 'location', 'date', 'entry_fee', 'weight_category']
+        for field in required_fields:
+            if field not in request.form:
+                return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
+
+        # Parse date string to datetime object
+        try:
+            competition_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'success': False, 'message': 'Invalid date format. Use YYYY-MM-DD'}), 400
+
         competition = Competition(
             competition_name=request.form['competition_name'],
             location=request.form['location'],
-            date=datetime.strptime(request.form['date'], '%Y-%m-%d'),
+            date=competition_date,
             entry_fee=float(request.form['entry_fee']),
             weight_category=request.form['weight_category']
         )
         db.session.add(competition)
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Competition added successfully', 'competition': {
-            'id': competition.competition_id,
-            'name': competition.competition_name
-        }})
+
+        return jsonify({
+            'success': True,
+            'message': 'Competition added successfully',
+            'competition': {
+                'id': competition.competition_id,
+                'name': competition.competition_name,
+                'date': competition.date.strftime('%Y-%m-%d'),  # Changed from strptime to strftime
+            }
+        })
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'Invalid numeric value provided'}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 400
 
+@app.route('/admin/competitions/delete/<competition_id>', methods=['POST'])
+@admin_required
+def delete_competition(competition_id):
+    try:
+        competition = Competition.query.filter_by(competition_id=competition_id).first()
+        if not competition:
+            return jsonify({'success': False, 'message': 'Competition not found'}), 404
 
+        # With cascade delete in models, just delete the competition
+        db.session.delete(competition)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Competition and all related records deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
 @app.route('/admin/competitions/edit/<competition_id>', methods=['PUT'])
 @admin_required
 def edit_competition(competition_id):
@@ -470,20 +524,6 @@ def edit_competition(competition_id):
         return jsonify({'success': False, 'message': str(e)}), 400
 
 
-@app.route('/admin/competitions/delete/<competition_id>', methods=['POST'])
-@admin_required
-def delete_competition(competition_id):
-    try:
-        competition = Competition.query.filter_by(competition_id=competition_id).first()
-        if not competition:
-            return jsonify({'success': False, 'message': 'Competition not found'}), 404
-
-        db.session.delete(competition)
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'Competition deleted successfully'})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)}), 400
 
 @app.route('/guest_view')
 def guest_view():

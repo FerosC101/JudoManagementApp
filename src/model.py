@@ -11,10 +11,10 @@ class Athlete(db.Model):
     current_weight = db.Column(db.Float, nullable=False)
     weight_category = db.Column(db.String(20), nullable=True)
 
-    # Updated backrefs for relationships with unique names to avoid conflicts
-    athlete_trainings = db.relationship('AthleteTraining', backref='athlete_for_training', lazy=True)
-    athlete_competitions = db.relationship('AthleteCompetition', backref='athlete_for_competition', lazy=True)
-    athlete_payments = db.relationship('Payment', backref='athlete_for_payment', lazy=True)
+    # Relationships with cascade on the "one" side
+    athlete_trainings = db.relationship('AthleteTraining', backref='athlete_for_training', lazy=True, cascade='all, delete-orphan')
+    athlete_competitions = db.relationship('AthleteCompetition', backref='athlete_for_competition', lazy=True, cascade='all, delete-orphan')
+    athlete_payments = db.relationship('Payment', backref='athlete_for_payment', lazy=True, cascade='all, delete-orphan')
 
     @staticmethod
     def generate_athlete_id():
@@ -30,13 +30,14 @@ class TrainingPlan(db.Model):
     plan_name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text, nullable=True)
     monthly_fee = db.Column(db.Float, nullable=False)
-    weekly_fee = db.Column(db.Float, nullable=True)  # Added weekly fee
-    private_hourly_fee = db.Column(db.Float, nullable=True)  # Added private hourly fee
-    category = db.Column(db.String(20), nullable=False)  # Added category field with values Beginner, Intermediate, Elite
+    weekly_fee = db.Column(db.Float, nullable=True)
+    private_hourly_fee = db.Column(db.Float, nullable=True)
+    category = db.Column(db.String(20), nullable=False)
     session_per_week = db.Column(db.Integer, nullable=True)
 
-    # Updated backref for reverse relationship to avoid conflict
-    athlete_assignments = db.relationship('AthleteTraining', backref='training_plan_for_athlete', lazy=True)
+    # Relationships with cascade on the "one" side
+    athlete_assignments = db.relationship('AthleteTraining', backref='training_plan', lazy=True, cascade='all, delete-orphan')
+    payments = db.relationship('Payment', backref='training_plan', lazy=True, cascade='all, delete-orphan')
 
 
 # Competition Model
@@ -46,11 +47,11 @@ class Competition(db.Model):
     competition_name = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(100), nullable=True)
     date = db.Column(db.Date, nullable=True)
-    weight_category = db.Column(db.String(20), nullable=False)  # Added weight category
-    entry_fee = db.Column(db.Float, nullable=False)  # Added entry fee for competitions
+    weight_category = db.Column(db.String(20), nullable=False)
+    entry_fee = db.Column(db.Float, nullable=False)
 
-    # Updated backref for reverse relationship to avoid conflict
-    competition_participants = db.relationship('AthleteCompetition', backref='competition_for_athlete', lazy=True)
+    # Relationship with cascade on the "one" side
+    competition_participants = db.relationship('AthleteCompetition', backref='competition', lazy=True, cascade='all, delete-orphan')
 
 
 # Payment Model
@@ -64,19 +65,16 @@ class Payment(db.Model):
     payment_method = db.Column(db.String(20), nullable=False)
     plan_type = db.Column(Enum('monthly', 'weekly', 'private', name='plan_type_enum'), nullable=False)
 
-    # Backref for reverse relationship
-    training_plan = db.relationship('TrainingPlan', backref='payments', lazy=True)
-    athlete = db.relationship('Athlete', backref='payments', lazy=True)
-
 
 # Users Model
 class User(db.Model):
     __tablename__ = 'users'
-    user_id = db.Column(db.String(20), primary_key=True)  # Make sure this is TEXT
+    user_id = db.Column(db.String(20), primary_key=True)
     role = db.Column(db.String(50), nullable=False)
     athlete_id = db.Column(db.String(10), db.ForeignKey('athletes.athlete_id'), unique=True)
 
-    athlete = db.relationship('Athlete', backref='user')
+    # One-to-one relationship with cascade
+    athlete = db.relationship('Athlete', backref=db.backref('user', uselist=False, cascade='all, delete-orphan'), single_parent=True)
 
     __table_args__ = (
         db.CheckConstraint("role IN ('athlete', 'guest')", name="check_role"),
@@ -91,9 +89,6 @@ class AthleteCompetition(db.Model):
     competition_id = db.Column(db.Integer, db.ForeignKey('competitions.competition_id'), nullable=False)
     registration_date = db.Column(db.Date, nullable=False)
 
-    athlete = db.relationship('Athlete', backref='athlete_for_competition')  # Updated backref name
-    competition = db.relationship('Competition', backref='athletes')  # Backref for Competition
-
 
 # AthleteTraining Model
 class AthleteTraining(db.Model):
@@ -103,6 +98,3 @@ class AthleteTraining(db.Model):
     training_plan_id = db.Column(db.Integer, db.ForeignKey('training_plans.training_plan_id'), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=True)
-
-    athlete = db.relationship('Athlete', backref='athlete_for_training')  # Updated backref name
-    training_plan = db.relationship('TrainingPlan', backref='athlete_trainings')  # Changed the backref name here

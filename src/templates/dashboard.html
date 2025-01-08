@@ -548,6 +548,8 @@
         });
 
         function registerForPlan(button) {
+            // Close any open modals first
+
             const athleteId = button.getAttribute('data-athlete-id');
             const trainingPlanId = button.getAttribute('data-plan-id');
 
@@ -583,6 +585,7 @@
         }
 
         function registerForCompetition(url) {
+            closeModal();  // Close modal before redirecting
             window.location.href = url;
         }
 
@@ -633,13 +636,26 @@
 
 
         function closeModal() {
+            // Close the main modal
             const modalOverlay = document.getElementById('modal-overlay');
             const modal = document.getElementById('modal');
             if (modalOverlay) modalOverlay.style.display = 'none';
             if (modal) modal.style.display = 'none';
+
+            // Also remove any confirm dialogs that might be open
+            const confirmDialogs = document.querySelectorAll('.confirm-dialog');
+            const extraOverlays = document.querySelectorAll('.modal-overlay');
+
+            confirmDialogs.forEach(dialog => dialog.remove());
+            extraOverlays.forEach(overlay => {
+                if (overlay !== modalOverlay) {
+                    overlay.remove();
+                }
+            });
         }
 
-                function cancelTraining(trainingId) {
+        function cancelTraining(trainingId) {
+            closeModal()
             const dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
             dialog.innerHTML = `

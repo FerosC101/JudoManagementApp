@@ -390,7 +390,7 @@
     <div class="navbar">
         <h1>Judo Admin</h1>
         <div class="admin-controls">
-            <a href="/logout" class="admin-button">Logout</a>
+            <a href="{{ url_for('login') }}" class="admin-button">Logout</a>
         </div>
     </div>
 
@@ -430,7 +430,6 @@
             {% for plan in plans %}
             <div class="card" data-id="{{ plan.training_plan_id }}">
                 <div class="card-controls">
-                    <button class="card-button edit" onclick="handleEdit()">✎</button>
                     <button class="card-button delete">×</button>
                 </div>
                 <div class="card-content">
@@ -483,7 +482,6 @@
             {% for competition in competitions %}
             <div class="card" data-id="{{ competition.competition_id }}">
                 <div class="card-controls">
-                    <button class="card-button edit">✎</button>
                     <button class="card-button delete">×</button>
                 </div>
                 <div class="card-content">
@@ -601,6 +599,7 @@
     <div id="alert" class="alert"></div>
 
     <script>
+       // Modal and UI Control Functions
         function closeAllModals() {
             document.getElementById('modal-overlay').classList.remove('show');
             document.getElementById('add-plan-modal').classList.remove('show');
@@ -613,75 +612,234 @@
             });
         }
 
-        document.getElementById('add-plan-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
 
-            try {
-                const response = await fetch('/admin/plans/add', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
+        function closeEditForm(element) {
+            element.closest('.edit-form').classList.remove('show');
+        }
 
-                if (data.success) {
-                    showAlert(data.message, 'success');
-                    closeAllModals();
-                    location.reload();
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('An error occurred while adding the plan', 'error');
-            }
-        });
+        function closeDetailed(element) {
+            element.closest('.card-detailed').classList.remove('show');
+        }
 
-        // Add Competition Form Handler
-        document.getElementById('add-competition-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
+        // CRUD Operations
+        async function handleDelete(itemId, section) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                try {
+                    const response = await fetch(`/admin/${section}/delete/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-            try {
-                const response = await fetch('/admin/competitions/add', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (data.success) {
-                    showAlert(data.message, 'success');
-                    closeAllModals();
-                    location.reload();
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('An error occurred while adding the competition', 'error');
-            }
-        });
+                    if (data.success) {
+                        showAlert('Item deleted successfully', 'success');
+                        // Remove the card from the UI
+                        const card = document.querySelector(`.card[data-id="${itemId}"]`);
+                        if (card) {
+                            const section = card.closest('.section');
+                            card.remove();
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize edit button listeners
-            document.querySelectorAll('.card-button.edit').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent card click event
-                    const card = button.closest('.card');
-                    const editForm = card.querySelector('.edit-form');
+                            // Check if there are any remaining cards
+                            const remainingCards = section.querySelectorAll('.card:not(.empty)');
 
-                    if (editForm) {
-                        // Hide any other open forms first
-                        document.querySelectorAll('.edit-form.show').forEach(form => {
-                            if (form !== editForm) {
-                                form.classList.remove('show');
+                            if (remainingCards.length === 0) {
+                                // Add empty card if no cards remain
+                                const emptyCard = document.createElement('div');
+                                emptyCard.className = 'card empty';
+                                emptyCard.innerHTML = `<p>No ${section.id} available</p>`;
+                                section.querySelector('.scroll-container').appendChild(emptyCard);
                             }
-                        });
-                        // Toggle this form
-                        editForm.classList.add('show');
+                        }
+                    } else {
+                        showAlert(data.message || 'Failed to delete item', 'error');
                     }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    showAlert('An error occurred while deleting the item', 'error');
+                }
+            }
+        }
+
+        async function handleEdit(element, type) {
+            const form = element.closest('form');
+            const card = element.closest('.card');
+            const formData = new FormData(form);
+            const itemId = card.dataset.id;
+
+            try {
+                const response = await fetch(`/admin/${type}/edit/${itemId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Item updated successfully', 'success');
+                    location.reload();
+                } else {
+                    showAlert(data.message || 'Failed to update item', 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred while updating the item', 'error');
+            }
+        }
+
+        // HTML Generation Functions
+        function generatePlanCardHTML(plan) {
+            return `
+                <div class="card" data-id="${plan.training_plan_id}">
+                    <div class="card-controls">
+                        <button class="card-button delete">×</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-initial">${plan.plan_name[0]}</div>
+                        <div class="card-details">
+                            <p>${plan.plan_name}</p>
+                            <small>₱${plan.monthly_fee}/month</small>
+                            <small>₱${plan.weekly_fee}/week</small>
+                            <small>₱${plan.private_hourly_fee}/hour</small>
+                        </div>
+                    </div>
+                    <div class="card-detailed">
+                        <button class="close-button" onclick="closeDetailed(this)">×</button>
+                        <h3>${plan.plan_name}</h3>
+                        <p>Monthly Fee: ₱${plan.monthly_fee}</p>
+                        <p>Weekly Fee: ₱${plan.weekly_fee}</p>
+                        <p>Private Hour: ₱${plan.private_hourly_fee}</p>
+                    </div>
+                    <form class="edit-form">
+                        <label>Plan Name:</label>
+                        <input type="text" name="plan_name" value="${plan.plan_name}">
+                        <label>Monthly Fee:</label>
+                        <input type="number" name="monthly_fee" value="${plan.monthly_fee}">
+                        <label>Weekly Fee:</label>
+                        <input type="number" name="weekly_fee" value="${plan.weekly_fee}">
+                        <label>Private Hour Fee:</label>
+                        <input type="number" name="private_hourly_fee" value="${plan.private_hourly_fee}">
+                        <div class="edit-form-buttons">
+                            <button type="button" class="cancel" onclick="closeEditForm(this)">Cancel</button>
+                            <button type="button" class="save" onclick="handleEdit(this, 'plans')">Save</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        function generateCompetitionCardHTML(competition) {
+            return `
+                <div class="card" data-id="${competition.competition_id}">
+                    <div class="card-controls">
+                        <button class="card-button delete">×</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-initial">${competition.competition_name[0]}</div>
+                        <div class="card-details">
+                            <p>${competition.competition_name}</p>
+                            <small>${competition.date}</small>
+                        </div>
+                    </div>
+                    <div class="card-detailed">
+                        <button class="close-button" onclick="closeDetailed(this)">×</button>
+                        <h3>${competition.competition_name}</h3>
+                        <p>Date: ${competition.date}</p>
+                        <p>Location: ${competition.location}</p>
+                        <p>Entry Fee: ₱${competition.entry_fee}</p>
+                    </div>
+                    <form class="edit-form">
+                        <label>Competition Name:</label>
+                        <input type="text" name="competition_name" value="${competition.competition_name}">
+                        <label>Date:</label>
+                        <input type="date" name="date" value="${competition.date}">
+                        <label>Location:</label>
+                        <input type="text" name="location" value="${competition.location}">
+                        <label>Entry Fee:</label>
+                        <input type="number" name="entry_fee" value="${competition.entry_fee}">
+                        <div class="edit-form-buttons">
+                            <button type="button" class="cancel" onclick="closeEditForm(this)">Cancel</button>
+                            <button type="button" class="save" onclick="handleEdit(this, 'competitions')">Save</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        // Form Submission Handlers
+        function initializeFormHandlers() {
+            // Add Plan Form Handler
+            document.getElementById('add-plan-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                try {
+                    const response = await fetch('/admin/plans/add', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        closeAllModals();
+                        location.reload();
+                    } else {
+                        showAlert(data.message, 'error');
+                    }
+                } catch (error) {
+                    showAlert('An error occurred while adding the plan', 'error');
+                }
+            });
+
+            // Add Competition Form Handler
+            document.getElementById('add-competition-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                try {
+                    const response = await fetch('/admin/competitions/add', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        closeAllModals();
+                        location.reload();
+                    } else {
+                        showAlert(data.message, 'error');
+                    }
+                } catch (error) {
+                    showAlert('An error occurred while adding the competition', 'error');
+                }
+            });
+        }
+
+        // Event Listeners Initialization
+        function initializeEventListeners() {
+            // Delete button listeners
+            document.querySelectorAll('.card-button.delete').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const card = button.closest('.card');
+                    const itemId = card.dataset.id;
+                    const section = card.closest('.section').id;
+                    handleDelete(itemId, section);
                 });
             });
 
-            // Initialize card content click listeners
+            // Card content click listeners
             document.querySelectorAll('.card-content').forEach(content => {
                 content.addEventListener('click', (e) => {
                     if (!e.target.closest('.card-controls')) {
@@ -694,264 +852,15 @@
                 });
             });
 
-            // Initialize delete button listeners
-            document.querySelectorAll('.card-button.delete').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (confirm('Are you sure you want to delete this item?')) {
-                        const card = button.closest('.card');
-                        const itemId = card.dataset.id;
-                        const section = card.closest('.section').id;
-
-                        try {
-                            const response = await fetch(`/admin/${section}/delete/${itemId}`, {
-                                method: 'POST'
-                            });
-                            const data = await response.json();
-
-                            if (data.success) {
-                                showAlert('Item deleted successfully', 'success');
-                                card.remove();
-                            } else {
-                                showAlert('Failed to delete item', 'error');
-                            }
-                        } catch (error) {
-                            showAlert('An error occurred while deleting the item', 'error');
-                        }
-                    }
-                });
-            });
-        });
-
-        // Close modals when clicking overlay
-        document.getElementById('modal-overlay').addEventListener('click', closeAllModals);
-
-
-
-        function showAlert(message, type) {
-            const alert = document.getElementById('alert');
-            alert.textContent = message;
-            alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 3000);
+            // Modal overlay click handler
+            document.getElementById('modal-overlay').addEventListener('click', closeAllModals);
         }
 
-
-        // Add Plan Form Handler
-        document.getElementById('add-plan-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-
-            try {
-                const response = await fetch('/admin/plans/add', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert(data.message, 'success');
-                    closeAllModals();
-                    // Refresh the page or update the UI
-                    location.reload();
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('An error occurred while adding the plan', 'error');
-            }
+        // Initialize everything when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFormHandlers();
+            initializeEventListeners();
         });
-
-        // Add Competition Form Handler
-        document.getElementById('add-competition-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-
-            try {
-                const response = await fetch('/admin/competitions/add', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert(data.message, 'success');
-                    closeAllModals();
-                    // Refresh the page or update the UI
-                    location.reload();
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('An error occurred while adding the competition', 'error');
-            }
-        });
-
-        // Delete handlers
-       document.querySelectorAll('.card').forEach(card => {
-        if (!card.classList.contains('empty')) {
-            // Handle card click
-            card.querySelector('.card-content').addEventListener('click', (e) => {
-                if (!e.target.closest('.card-controls')) {
-                    const detailed = card.querySelector('.card-detailed');
-                    if (detailed) {
-                        detailed.classList.add('show');
-                    }
-                }
-            });
-
-            // Handle edit button
-            const editButton = card.querySelector('.card-button.edit');
-            if (editButton) {
-                editButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const editForm = card.querySelector('.edit-form');
-                    if (editForm) {
-                        editForm.classList.add('show');
-                    }
-                });
-            }
-        }
-    });
-
-
-    // Function to close edit form
-    function closeEditForm(element) {
-        element.closest('.edit-form').classList.remove('show');
-    }
-
-     function closeDetailed(element) {
-        element.closest('.card-detailed').classList.remove('show');
-    }
-
-
-    async function handleEdit(element, type) {
-        const form = element.closest('form');
-        const card = element.closest('.card');
-        const formData = new FormData(form);
-        const itemId = card.dataset.id;
-
-        try {
-            const response = await fetch(`/admin/${type}/edit/${itemId}`, {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                showAlert('Item updated successfully', 'success');
-                location.reload();
-            } else {
-                showAlert(data.message || 'Failed to update item', 'error');
-            }
-        } catch (error) {
-            showAlert('An error occurred while updating the item', 'error');
-        }
-    }
-
-    function initializeCardListeners() {
-        document.querySelectorAll('.card').forEach(card => {
-            if (!card.classList.contains('empty')) {
-                // Handle card content click
-                const cardContent = card.querySelector('.card-content');
-                if (cardContent) {
-                    cardContent.addEventListener('click', (e) => {
-                        if (!e.target.closest('.card-controls')) {
-                            const detailed = card.querySelector('.card-detailed');
-                            if (detailed) {
-                                detailed.classList.add('show');
-                            }
-                        }
-                    });
-                }
-
-                // Handle edit button click
-                const editButton = card.querySelector('.card-button.edit');
-                if (editButton) {
-                    editButton.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const editForm = card.querySelector('.edit-form');
-                        if (editForm) {
-                            // Hide any other open forms first
-                            document.querySelectorAll('.edit-form.show').forEach(form => {
-                                form.classList.remove('show');
-                            });
-                            // Show this form
-                            editForm.classList.add('show');
-                        }
-                    });
-                }
-
-                // Handle delete button click
-                const deleteButton = card.querySelector('.card-button.delete');
-                if (deleteButton) {
-                    deleteButton.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        // Add your delete functionality here
-                    });
-                }
-            }
-        });
-    }
-
-
-     function updateCardsHTML() {
-        // For Training Plans
-        document.querySelectorAll('#plans .card:not(.empty)').forEach(card => {
-            // Add detailed view
-            card.innerHTML += `
-                <div class="card-detailed">
-                    <button class="close-button" onclick="closeDetailed(this)">×</button>
-                    <h3>${card.querySelector('.card-details p').textContent}</h3>
-                    <p>Monthly Fee: ₱${card.querySelector('small:nth-child(2)').textContent}</p>
-                    <p>Weekly Fee: ₱${card.querySelector('small:nth-child(3)').textContent}</p>
-                    <p>Private Hour: ₱${card.querySelector('small:nth-child(4)').textContent}</p>
-                </div>
-                <form class="edit-form">
-                    <label>Plan Name:</label>
-                    <input type="text" name="plan_name" value="${card.querySelector('.card-details p').textContent}">
-                    <label>Monthly Fee:</label>
-                    <input type="number" name="monthly_fee" value="${card.querySelector('small:nth-child(2)').textContent.replace(/[₱\/month]/g, '')}">
-                    <label>Weekly Fee:</label>
-                    <input type="number" name="weekly_fee" value="${card.querySelector('small:nth-child(3)').textContent.replace(/[₱\/week]/g, '')}">
-                    <label>Private Hour Fee:</label>
-                    <input type="number" name="private_hourly_fee" value="${card.querySelector('small:nth-child(4)').textContent.replace(/[₱\/hour]/g, '')}">
-                    <div class="edit-form-buttons">
-                        <button type="button" class="cancel" onclick="closeEditForm(this)">Cancel</button>
-                        <button type="button" class="save" onclick="handleEdit(this, 'plans')">Save</button>
-                    </div>
-                </form>
-            `;
-        });
-
-        // For Competitions
-        document.querySelectorAll('#competitions .card:not(.empty)').forEach(card => {
-            card.innerHTML += `
-                <div class="card-detailed">
-                    <button class="close-button" onclick="closeDetailed(this)">×</button>
-                    <h3>${card.querySelector('.card-details p').textContent}</h3>
-                    <p>Date: ${card.querySelector('.card-details small').textContent}</p>
-                </div>
-                <form class="edit-form">
-                    <label>Competition Name:</label>
-                    <input type="text" name="competition_name" value="${card.querySelector('.card-details p').textContent}">
-                    <label>Date:</label>
-                    <input type="date" name="date" value="${card.querySelector('.card-details small').textContent}">
-                    <div class="edit-form-buttons">
-                        <button type="button" class="cancel" onclick="closeEditForm(this)">Cancel</button>
-                        <button type="button" class="save" onclick="handleEdit(this, 'competitions')">Save</button>
-                    </div>
-                </form>
-            `;
-        });
-    }
-
-    // Call the function when the page loads
-    document.addEventListener('DOMContentLoaded', updateCardsHTML);
-
-
     </script>
 </body>
 </html>
