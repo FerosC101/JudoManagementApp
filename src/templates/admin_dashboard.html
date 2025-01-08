@@ -226,6 +226,23 @@
         .show {
             display: block;
         }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            color: white;
+            z-index: 1001;
+            display: none;
+        }
+        .alert.success {
+            background: #4CAF50;
+        }
+        .alert.error {
+            background: #ff4444;
+        }
     </style>
 </head>
 <body>
@@ -241,19 +258,25 @@
             <h2>Athletes</h2>
         </div>
         <div class="scroll-container">
-            <div class="card">
+            {% for athlete in athletes %}
+            <div class="card" data-id="{{ athlete.athlete_id }}">
                 <div class="card-controls">
                     <button class="card-button delete">×</button>
                 </div>
-                J
-            </div>
-            <div class="card">
-                <div class="card-controls">
-                    <button class="card-button delete">×</button>
+                <div class="card-content">
+                    <div class="card-initial">{{ athlete.first_name[0] }}</div>
+                    <div class="card-details">
+                        <p>{{ athlete.first_name }} {{ athlete.last_name }}</p>
+                        <small>{{ athlete.weight_category }}</small>
+                    </div>
                 </div>
-                M
             </div>
-            <!-- Add more athlete cards as needed -->
+            {% endfor %}
+            {% if not athletes %}
+            <div class="card empty">
+                <p>No athletes registered</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -263,14 +286,27 @@
             <button class="admin-button" onclick="document.getElementById('add-plan-modal').classList.add('show'); document.getElementById('modal-overlay').classList.add('show')">Add Plan</button>
         </div>
         <div class="scroll-container">
-            <div class="card">
+            {% for plan in plans %}
+            <div class="card" data-id="{{ plan.training_plan_id }}">
                 <div class="card-controls">
                     <button class="card-button edit">✎</button>
                     <button class="card-button delete">×</button>
                 </div>
-                B
+                <div class="card-content">
+                    <div class="card-initial">{{ plan.plan_name[0] }}</div>
+                    <div class="card-details">
+                        <p>{{ plan.plan_name }}</p>
+                        <small>₱{{ plan.monthly_fee }}/month</small>
+                        <small></small>
+                    </div>
+                </div>
             </div>
-            <!-- Add more plan cards as needed -->
+            {% endfor %}
+            {% if not plans %}
+            <div class="card empty">
+                <p>No training plans available</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -297,7 +333,7 @@
     <!-- Add Plan Modal -->
     <div class="modal" id="add-plan-modal">
         <div class="modal-header">Add Training Plan</div>
-        <form>
+        <form id="add-plan-form">
             <div class="form-group">
                 <label for="plan_name">Plan Name</label>
                 <input type="text" id="plan_name" name="plan_name" required>
@@ -308,11 +344,23 @@
             </div>
             <div class="form-group">
                 <label for="monthly_fee">Monthly Fee</label>
-                <input type="number" id="monthly_fee" name="monthly_fee" required>
+                <input type="number" step="0.01" id="monthly_fee" name="monthly_fee" required>
             </div>
             <div class="form-group">
-                <label for="sessions">Sessions per Week</label>
-                <input type="number" id="sessions" name="sessions" required>
+                <label for="weekly_fee">Weekly Fee</label>
+                <input type="number" step="0.01" id="weekly_fee" name="weekly_fee" required>
+            </div>
+            <div class="form-group">
+                <label for="private_hourly_fee">Private Hourly Fee</label>
+                <input type="number" step="0.01" id="private_hourly_fee" name="private_hourly_fee" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" required>
+            </div>
+            <div class="form-group">
+                <label for="session_per_week">Sessions per Week</label>
+                <input type="number" id="session_per_week" name="session_per_week" required>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="modal-button secondary" onclick="closeAllModals()">Cancel</button>
@@ -324,7 +372,7 @@
     <!-- Add Competition Modal -->
     <div class="modal" id="add-competition-modal">
         <div class="modal-header">Add Competition</div>
-        <form>
+        <form id="add-competition-form">
             <div class="form-group">
                 <label for="competition_name">Competition Name</label>
                 <input type="text" id="competition_name" name="competition_name" required>
@@ -339,7 +387,11 @@
             </div>
             <div class="form-group">
                 <label for="entry_fee">Entry Fee</label>
-                <input type="number" id="entry_fee" name="entry_fee" required>
+                <input type="number" step="0.01" id="entry_fee" name="entry_fee" required>
+            </div>
+            <div class="form-group">
+                <label for="weight_category">Weight Category</label>
+                <input type="text" id="weight_category" name="weight_category" required>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="modal-button secondary" onclick="closeAllModals()">Cancel</button>
@@ -348,12 +400,104 @@
         </form>
     </div>
 
+    <div id="alert" class="alert"></div>
+
     <script>
         function closeAllModals() {
             document.getElementById('modal-overlay').classList.remove('show');
             document.getElementById('add-plan-modal').classList.remove('show');
             document.getElementById('add-competition-modal').classList.remove('show');
+
         }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Add Plan Form Handler
+        document.getElementById('add-plan-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('/admin/plans/add', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    closeAllModals();
+                    // Refresh the page or update the UI
+                    location.reload();
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred while adding the plan', 'error');
+            }
+        });
+
+        // Add Competition Form Handler
+        document.getElementById('add-competition-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('/admin/competitions/add', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    closeAllModals();
+                    // Refresh the page or update the UI
+                    location.reload();
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                showAlert('An error occurred while adding the competition', 'error');
+            }
+        });
+
+        // Delete handlers
+        document.querySelectorAll('.card-button.delete').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                if (!confirm('Are you sure you want to delete this item?')) {
+                    return;
+                }
+
+                const card = e.target.closest('.card');
+                const itemId = card.dataset.id;
+                const itemType = card.closest('.section').id; // athletes, plans, or competitions
+
+                try {
+                    const response = await fetch(`/admin/${itemType}/delete/${itemId}`, {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        card.remove();
+                    } else {
+                        showAlert(data.message, 'error');
+                    }
+                } catch (error) {
+                    showAlert('An error occurred while deleting the item', 'error');
+                }
+            });
+        });
     </script>
 </body>
 </html>

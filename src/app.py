@@ -1,3 +1,5 @@
+from functools import wraps
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from src.extension import db
 from src.model import User, Athlete, TrainingPlan, Competition, AthleteTraining, Payment, AthleteCompetition
@@ -28,6 +30,13 @@ def login():
 
         athlete_id = athlete_id.strip()
 
+        # Check for specific admin ID
+        if athlete_id == '428912':
+            session['athlete_id'] = athlete_id
+            session['role'] = 'admin'
+            return redirect(url_for('admin_dashboard'))
+
+        # Fetch athlete data from the database
         athlete_data = get_athlete_by_id(athlete_id)
 
         if athlete_data:
@@ -46,6 +55,7 @@ def login():
             return render_template('login.html')
 
     return render_template('login.html')
+
 
 # Register Route
 @app.route('/register', methods=['GET', 'POST'])
@@ -315,13 +325,165 @@ def cancel_training(training_id):
         return redirect(url_for('dashboard'))
 
 
-@app.route('/admin_dashboard')
-def admin_dashboard():
-    if session.get('role') != 'admin':
-        flash("Access denied.", "error")
-        return redirect(url_for('login'))
-    return render_template('admin_dashboard.html')
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if session.get('role') != 'admin':
+            flash("Access denied.", "error")
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return wrapper
 
+@app.route('/admin_dashboard')
+@admin_required
+def admin_dashboard():
+    athletes = Athlete.query.all()
+    plans = TrainingPlan.query.all()
+    competitions = Competition.query.all()
+    return render_template('admin_dashboard.html',
+                           athletes=athletes,
+                           plans=plans,
+                           competitions=competitions)
+
+
+# Athletes routes
+@app.route('/admin/athletes/delete/<athlete_id>', methods=['POST'])
+@admin_required
+def delete_athlete(athlete_id):
+    try:
+        athlete = Athlete.query.filter_by(athlete_id=athlete_id).first()
+        if not athlete:
+            return jsonify({'success': False, 'message': 'Athlete not found'}), 404
+
+        db.session.delete(athlete)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Athlete deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+# Training Plans routes
+@app.route('/admin/plans/add', methods=['POST'])
+@admin_required
+def add_plan():
+    try:
+        plan = TrainingPlan(
+            plan_name=request.form['plan_name'],
+            description=request.form['description'],
+            monthly_fee=float(request.form['monthly_fee']),
+            weekly_fee=float(request.form['weekly_fee']),
+            private_hourly_fee=float(request.form['private_hourly_fee']),
+            category=request.form['category'],
+            session_per_week=int(request.form['session_per_week'])
+        )
+        db.session.add(plan)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Plan added successfully', 'plan': {
+            'id': plan.training_plan_id,
+            'name': plan.plan_name
+        }})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
+@app.route('/admin/plans/edit/<training_plan_id>', methods=['PUT'])
+@admin_required
+def edit_plan(training_plan_id):
+    try:
+        plan = TrainingPlan.query.filter_by(training_plan_id=training_plan_id).first()
+        if not plan:
+            return jsonify({'success': False, 'message': 'Plan not found'}), 404
+
+        plan.plan_name = request.form['plan_name']
+        plan.description = request.form['description']
+        plan.monthly_fee = float(request.form['monthly_fee'])
+        plan.weekly_fee = float(request.form['weekly_fee'])
+        plan.private_hourly_fee = float(request.form['private_hourly_fee'])
+        plan.category = request.form['category']
+        plan.session_per_week = int(request.form['session_per_week'])
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Plan updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
+@app.route('/admin/plans/delete/<training_plan_id>', methods=['POST'])
+@admin_required
+def delete_plan(training_plan_id):
+    try:
+        plan = TrainingPlan.query.filter_by(training_plan_id=training_plan_id).first()
+        if not plan:
+            return jsonify({'success': False, 'message': 'Plan not found'}), 404
+
+        db.session.delete(plan)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Plan deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
+# Competitions routes
+@app.route('/admin/competitions/add', methods=['POST'])
+@admin_required
+def add_competition():
+    try:
+        competition = Competition(
+            competition_name=request.form['competition_name'],
+            location=request.form['location'],
+            date=datetime.strptime(request.form['date'], '%Y-%m-%d'),
+            entry_fee=float(request.form['entry_fee']),
+            weight_category=request.form['weight_category']
+        )
+        db.session.add(competition)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Competition added successfully', 'competition': {
+            'id': competition.competition_id,
+            'name': competition.competition_name
+        }})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
+@app.route('/admin/competitions/edit/<competition_id>', methods=['PUT'])
+@admin_required
+def edit_competition(competition_id):
+    try:
+        competition = Competition.query.filter_by(competition_id=competition_id).first()
+        if not competition:
+            return jsonify({'success': False, 'message': 'Competition not found'}), 404
+
+        competition.competition_name = request.form['competition_name']
+        competition.location = request.form['location']
+        competition.date = datetime.strptime(request.form['date'], '%Y-%m-%d')
+        competition.entry_fee = float(request.form['entry_fee'])
+        competition.weight_category = request.form['weight_category']
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Competition updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
+@app.route('/admin/competitions/delete/<competition_id>', methods=['POST'])
+@admin_required
+def delete_competition(competition_id):
+    try:
+        competition = Competition.query.filter_by(competition_id=competition_id).first()
+        if not competition:
+            return jsonify({'success': False, 'message': 'Competition not found'}), 404
+
+        db.session.delete(competition)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Competition deleted successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 400
 
 @app.route('/guest_view')
 def guest_view():
