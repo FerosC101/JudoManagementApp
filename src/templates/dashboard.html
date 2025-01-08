@@ -549,7 +549,6 @@
 
         function registerForPlan(button) {
             // Close any open modals first
-
             const athleteId = button.getAttribute('data-athlete-id');
             const trainingPlanId = button.getAttribute('data-plan-id');
 
@@ -589,16 +588,13 @@
             window.location.href = url;
         }
 
-
         function showDetails(title, content) {
-
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
             document.getElementById('modal-overlay').style.display = 'block';
             document.getElementById('modal').style.display = 'block';
 
             // Add scroll buttons
-
             const modal = document.getElementById('modal');
             checkScrollButtons(modal);
 
@@ -609,17 +605,10 @@
             const modal = document.getElementById('modal');
             const scrollAmount = 300; // Adjust scroll amount as needed
 
-            if (direction === 'up') {
-                modal.scrollBy({
-                    top: -scrollAmount,
-                    behavior: 'smooth'
-                });
-            } else {
-                modal.scrollBy({
-                    top: scrollAmount,
-                    behavior: 'smooth'
-                });
-            }
+            modal.scrollBy({
+                top: direction === 'up' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
         }
 
         function checkScrollButtons(modal) {
@@ -634,7 +623,6 @@
             scrollButtons.style.top = `${modalRect.top + 20}px`;
             scrollButtons.style.height = `${modalRect.height - 40}px`; // Account for padding
         }
-
 
         function closeModal() {
             // Close the main modal
@@ -656,7 +644,7 @@
         }
 
         function cancelTraining(trainingId) {
-            closeModal()
+            closeModal();
             const dialog = document.createElement('div');
             dialog.className = 'confirm-dialog';
             dialog.innerHTML = `
@@ -684,45 +672,6 @@
             if (overlay) overlay.remove();
         }
 
-        function confirmCancelTraining(trainingId, dialog) {
-            fetch(`/cancel_training/${trainingId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'  // Add this header
-                },
-                credentials: 'same-origin'  // Add this to ensure cookies are sent
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Remove the plan card from the display
-                    const planCard = document.querySelector(`[data-training-id="${trainingId}"]`);
-                    if (planCard) {
-                        planCard.remove();
-                    }
-
-                    // Close the modal and refresh the athlete details
-                    closeModal();
-                    showAthleteDetails();
-                } else {
-                    throw new Error(data.message || 'Failed to cancel training plan');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to cancel training plan. Please try again.');
-            })
-            .finally(() => {
-                closeDialog(dialog);
-            });
-        }
-
         function switchTab(tabName) {
             const tabs = document.querySelectorAll('.modal-tab');
             const sections = document.querySelectorAll('.modal-content-section');
@@ -743,6 +692,7 @@
         }
 
         function showAthleteDetails() {
+            closeModal();
             const athleteData = {
                 name: "{{ athlete.name }}",
                 age: {{ athlete.age }},
@@ -834,32 +784,15 @@
                 {% endfor %}
             ];
 
-            const trainings = [
-                {% for training in athlete.athlete_trainings if not training.end_date %}
-                {
-                    id: {{ training.id }},
-                    plan_name: "{{ training.training_plan.plan_name }}",
-                    start_date: "{{ training.start_date }}",
-                    category: "{{ training.training_plan.category }}",
-                    monthly_fee: {{ training.training_plan.monthly_fee }},
-                    weekly_fee: {% if training.training_plan.weekly_fee %}{{ training.training_plan.weekly_fee }}{% else %}null{% endif %},
-                    private_hourly_fee: {% if training.training_plan.private_hourly_fee %}{{ training.training_plan.private_hourly_fee }}{% else %}null{% endif %}
-                }{% if not loop.last %},{% endif %}
-                {% endfor %}
-            ];
-
             const content = `
-                <div class="modal-tabs">
-                    <button class="modal-tab active" onclick="switchTab('payments')">Payment History</button>
-                    <button class="modal-tab" onclick="switchTab('subscriptions')">Active Plans</button>
-                </div>
-                <div id="payments-section" class="modal-content-section active">
+                <div class="payment-history-section">
+                    <h3>Payment History</h3>
                     <table class="payment-history">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Plan</th>
-                                <th>Type</th>
+                                <th>Payment Date</th>
+                                <th>Plan Name</th>
+                                <th>Plan Type</th>
                                 <th>Amount</th>
                                 <th>Payment Method</th>
                             </tr>
@@ -876,29 +809,52 @@
                             `).join('')}
                         </tbody>
                     </table>
-                </div>
-                <div id="subscriptions-section" class="modal-content-section">
-                    ${trainings.map(training => `
-                        <div class="subscription-card">
-                            <h3>${training.plan_name}</h3>
-                            <p><strong>Started:</strong> ${training.start_date}</p>
-                            <p><strong>Category:</strong> ${training.category}</p>
-                            <p><strong>Monthly Fee:</strong> ₱${training.monthly_fee}</p>
-                            ${training.weekly_fee ? `<p><strong>Weekly Fee:</strong> ₱${training.weekly_fee}</p>` : ''}
-                            ${training.private_hourly_fee ? `<p><strong>Private Hour:</strong> ₱${training.private_hourly_fee}</p>` : ''}
-                            <button
-                                class="cancel-button"
-                                onclick="cancelTraining(${training.id})">
-                                Cancel Training Plan
-                            </button>
-                        </div>
-                    `).join('')}
                 </div>`;
 
-            showDetails('Payments & Plans', content);
+            showDetails('Payment History', content);
         }
 
+        function showSubscriptions() {
+            const plans = [
+                {% for plan in athlete.training_plans %}
+                {
+                    plan_name: "{{ plan.plan_name }}",
+                    plan_type: "{{ plan.plan_type }}",
+                    amount: {{ plan.amount }},
+                    payment_method: "{{ plan.payment_method }}"
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ];
+
+            const content = `
+                <div class="subscriptions-section">
+                    <h3>Active Subscriptions</h3>
+                    <table class="active-plans">
+                        <thead>
+                            <tr>
+                                <th>Plan Name</th>
+                                <th>Plan Type</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${plans.map(plan => `
+                                <tr>
+                                    <td>${plan.plan_name}</td>
+                                    <td>${plan.plan_type}</td>
+                                    <td>₱${plan.amount}</td>
+                                    <td>${plan.payment_method}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+
+            showDetails('Subscriptions', content);
+        }
     </script>
+
 </head>
 <body>
     <div class="navbar">
@@ -917,11 +873,11 @@
         <h2>Athletes</h2>
         <div class="scroll-container">
             {% for athlete in athletes %}
-                <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}', `
-                    <strong>Age:</strong> {{ athlete.age }}<br>
+                <div class="card" onclick="showDetails('Athlete: {{ athlete.name }}',
+                    `<strong>Age:</strong> {{ athlete.age }}<br>
                     <strong>Weight:</strong> {{ athlete.current_weight }} kg<br>
-                    <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>
-                `)">
+                    <strong>Weight Category:</strong> {{ athlete.weight_category }}<br>`
+                )">
                     {{ athlete.name[0] }}
                 </div>
             {% endfor %}
@@ -933,20 +889,20 @@
         <div class="scroll-container">
             {% for plan in plans %}
                 <div class="card" onclick="showDetails('{{ plan.plan_name }}',
-                    '<strong>Description:</strong> {{ plan.description }}<br>' +
-                    '<strong>Monthly Fee:</strong> ₱{{ plan.monthly_fee }}<br>' +
-                    '<strong>Weekly Fee:</strong> ₱{{ plan.weekly_fee }}<br>' +
-                    '<strong>Private Hourly Fee:</strong> ₱{{ plan.private_hourly_fee }}<br>' +
-                    '<strong>Category:</strong> {{ plan.category }}<br>' +
-                    '<strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>' +
-                    '<button ' +
-                        'class=\'modal-close\' ' +
-                        'data-athlete-id=\'{{ athlete_id }}\' ' +
-                        'data-plan-id=\'{{ plan.training_plan_id }}\' ' +
-                        'onclick=\'registerForPlan(this); event.stopPropagation();\'' +
-                    '>' +
-                        'Register for {{ plan.plan_name }}' +
-                    '</button>'
+                    `<strong>Description:</strong> {{ plan.description }}<br>
+                    <strong>Monthly Fee:</strong> ₱{{ plan.monthly_fee }}<br>
+                    <strong>Weekly Fee:</strong> ₱{{ plan.weekly_fee }}<br>
+                    <strong>Private Hourly Fee:</strong> ₱{{ plan.private_hourly_fee }}<br>
+                    <strong>Category:</strong> {{ plan.category }}<br>
+                    <strong>Sessions Per Week:</strong> {{ plan.session_per_week }}<br>
+                    <button
+                        class='modal-close'
+                        data-athlete-id='{{ athlete_id }}'
+                        data-plan-id='{{ plan.training_plan_id }}'
+                        onclick='registerForPlan(this); event.stopPropagation();'
+                    >
+                        Register for {{ plan.plan_name }}
+                    </button>`
                 )">
                     {{ plan.plan_name[0] }}
                 </div>
@@ -972,6 +928,7 @@
         </div>
     </div>
 
+    <!-- Keep only this modal structure at the bottom of the body -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal()"></div>
     <div id="modal" class="modal">
         <div id="modal-title" class="modal-header"></div>
