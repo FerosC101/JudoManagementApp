@@ -9,27 +9,27 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background: #2c2c2c; /* Deep Gray */
-            color: #f5f5dc; /* Cream */
+            background: #2c2c2c;
+            color: #f5f5dc;
         }
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 30px;
-            background: #3c3c3c; /* Slightly lighter deep gray */
-            color: #ffca28; /* Mustard Yellow */
-            border-bottom: 2px solid #1e40af; /* Ultramarine */
+            background: #3c3c3c;
+            color: #ffca28;
+            border-bottom: 2px solid #1e40af;
         }
         .navbar h1 {
             margin: 0;
             font-size: 2.5rem;
-            color: #ffca28; /* Mustard Yellow */
+            color: #ffca28;
         }
         .form-container {
             max-width: 400px;
             margin: 50px auto;
-            background: #3c3c3c; /* Slightly lighter deep gray */
+            background: #3c3c3c;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -37,7 +37,7 @@
         }
         .form-container h2 {
             text-align: center;
-            color: #ffca28; /* Mustard Yellow */
+            color: #ffca28;
             margin-bottom: 20px;
         }
         .form-group {
@@ -51,40 +51,40 @@
         .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
-            background: #2c2c2c; /* Deep Gray */
+            background: #2c2c2c;
             border: 1px solid #5a5a5a;
             border-radius: 5px;
-            color: #f5f5dc; /* Cream */
+            color: #f5f5dc;
             font-size: 1rem;
         }
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #1e40af; /* Ultramarine */
+            border-color: #1e40af;
             box-shadow: 0 0 5px rgba(30, 64, 175, 0.7);
         }
         .form-container button {
             width: 100%;
             padding: 10px;
-            background: #ffca28; /* Mustard Yellow */
+            background: #ffca28;
             border: none;
             border-radius: 5px;
-            color: #2c2c2c; /* Deep Gray */
+            color: #2c2c2c;
             font-size: 1.2rem;
             cursor: pointer;
             transition: background 0.3s;
         }
         .form-container button:hover {
-            background: #ffb300; /* Slightly darker mustard yellow */
+            background: #ffb300;
         }
         .form-container .back-link {
             display: block;
             text-align: center;
             margin-top: 10px;
-            color: #f5f5dc; /* Cream */
+            color: #f5f5dc;
             text-decoration: none;
         }
         .form-container .back-link:hover {
-            color: #1e40af; /* Ultramarine */
+            color: #1e40af;
         }
         .notification {
             margin-bottom: 15px;
@@ -94,12 +94,31 @@
             font-weight: bold;
         }
         .notification.success {
-            background: #28a745; /* Green */
+            background: #28a745;
             color: white;
         }
         .notification.error {
-            background: #dc3545; /* Red */
+            background: #dc3545;
             color: white;
+        }
+        /* New styles for athlete ID display */
+        .athlete-id {
+            background: #1e40af;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            display: none;
+        }
+        .athlete-id.visible {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -109,6 +128,11 @@
     </div>
 
     <div class="form-container">
+        <!-- Athlete ID Display Section -->
+        <div id="athleteIdDisplay" class="athlete-id">
+            Your Athlete ID: <span id="athleteIdNumber"></span>
+        </div>
+
         <!-- Notification Section -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -119,7 +143,7 @@
         {% endwith %}
 
         <h2>Register</h2>
-        <form action="/register" method="POST">
+        <form action="/register" method="POST" id="registrationForm">
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" placeholder="Enter your full name" required>
@@ -145,5 +169,47 @@
         </form>
         <a href="login.html" class="back-link">Back to Dashboard</a>
     </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Display the athlete ID
+                document.getElementById('athleteIdNumber').textContent = data.athlete_id;
+                document.getElementById('athleteIdDisplay').classList.add('visible');
+
+                // Clear the form
+                e.target.reset();
+
+                // Wait 3 seconds then redirect to login
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 3000);
+            } else {
+                // Handle error
+                const notification = document.createElement('div');
+                notification.className = 'notification error';
+                notification.textContent = data.message || 'Registration failed. Please try again.';
+                e.target.insertBefore(notification, e.target.firstChild);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            const notification = document.createElement('div');
+            notification.className = 'notification error';
+            notification.textContent = 'An error occurred. Please try again later.';
+            e.target.insertBefore(notification, e.target.firstChild);
+        }
+    });
+    </script>
 </body>
 </html>

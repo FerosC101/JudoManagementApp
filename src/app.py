@@ -55,7 +55,6 @@ def login():
     return render_template('login.html')
 
 
-# Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -64,25 +63,52 @@ def register():
         weight = request.form.get('weight')
         weight_category = request.form.get('weight_category')
 
+        # Validate required fields
         if not name or not age or not weight or not weight_category:
-            return render_template('register.html')
+            return jsonify({
+                'success': False,
+                'message': 'All fields are required'
+            }), 400
 
         athlete_id = Athlete.generate_athlete_id()
 
         try:
-            athlete = Athlete(athlete_id=athlete_id, name=name, age=int(age), current_weight=float(weight), weight_category=weight_category)
+            # Create athlete record
+            athlete = Athlete(
+                athlete_id=athlete_id,
+                name=name,
+                age=int(age),
+                current_weight=float(weight),
+                weight_category=weight_category
+            )
             db.session.add(athlete)
             db.session.commit()
 
-            user = User(user_id=athlete_id, role='athlete', athlete_id=athlete_id)
+            # Create user record
+            user = User(
+                user_id=athlete_id,
+                role='athlete',
+                athlete_id=athlete_id
+            )
             db.session.add(user)
             db.session.commit()
 
-            return redirect(url_for('login'))
+            flash(f'Registration successful! Your Athlete ID is: {athlete_id}', 'success')
+            return jsonify({
+                'success': True,
+                'message': 'Registration successful',
+                'athlete_id': athlete_id,
+                'redirect_url': url_for('login')
+            }), 200
+
         except Exception as e:
             db.session.rollback()
-            return render_template('register.html')
+            return jsonify({
+                'success': False,
+                'message': 'Registration failed. Please try again.'
+            }), 500
 
+    # GET request - return the registration page
     return render_template('register.html')
 
 @app.route('/dashboard')
@@ -250,7 +276,6 @@ def register_competition(athlete_id, competition_id):
                 ).first()
 
                 if existing_registration:
-                    flash("You are already registered for this competition.", "error")
                     return redirect(url_for('dashboard'))
 
                 # Create athlete competition registration
@@ -262,17 +287,14 @@ def register_competition(athlete_id, competition_id):
                 db.session.add(athlete_competition)
                 db.session.commit()
 
-                flash("Competition registration successful!", "success")
                 return redirect(url_for('dashboard'))
             except Exception as e:
                 db.session.rollback()
                 print(f"Error during registration: {str(e)}")  # Print the actual error
-                flash(f"Registration error: {str(e)}", "error")
                 return render_template('competition_registration.html', athlete=athlete, competition=competition)
 
         return render_template('competition_registration.html', athlete=athlete, competition=competition)
 
-    flash("You must be enrolled in an intermediate or elite plan to register for competitions.", "error")
     return redirect(url_for('dashboard'))
 
 
