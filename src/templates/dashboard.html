@@ -91,7 +91,27 @@
             display: flex;
             gap: 20px;
             overflow-x: auto;
-            padding: 10px 0;
+            padding: 20px 0;
+            margin: 0 -30px; /* Negative margin to align with edges */
+            padding-left: 30px; /* Add padding back on left */
+            padding-right: 30px; /* Add padding back on right */
+            scrollbar-width: thin;
+            scrollbar-color: #ffca28 #2c2c2c;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+            background: #2c2c2c;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
         }
 
         .card {
@@ -338,18 +358,16 @@
         /* Buttons */
         .modal-button {
             display: block;
-            width: 100%;
-            padding: 12px 20px;
             background: #ffca28;
-            color: #2c2c2c;
             border: none;
-            border-radius: 4px;
+            color: #2c2c2c;
             font-weight: bold;
-            margin-top: 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            margin: 10px auto;
+            width: 150px;
             text-align: center;
-            font-size: 1rem;
         }
 
         .modal-close {
@@ -599,7 +617,7 @@
                             data-athlete-id='${this.getAttribute('data-athlete-id')}'
                             data-plan-id='${this.getAttribute('data-plan-id')}'
                             onclick='registerForPlan(this); event.stopPropagation();'>
-                            Register for ${this.getAttribute('data-name')}
+                            Register for Training plan
                         </button>
                     `;
                     showDetails(this.getAttribute('data-name'), content);
@@ -619,7 +637,7 @@
                             <p><strong>Date:</strong> ${this.getAttribute('data-date')}</p>
                             <p><strong>Competition Fee:</strong> ₱${this.getAttribute('data-entry-fee')}</p>
                             <p><strong>Category:</strong> ${this.getAttribute('data-category')}</p>
-                            <button onclick="window.location.href='${registerUrl}'" class="modal-button">
+                            <button onclick="window.location.href='${registerUrl}'" class='modal-button'>
                                 Register for Competition
                             </button>
                         </div>`;

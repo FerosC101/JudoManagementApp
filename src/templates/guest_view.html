@@ -87,8 +87,29 @@
             display: flex;
             gap: 20px;
             overflow-x: auto;
-            padding: 10px 0;
+            padding: 20px 0;
+            margin: 0 -30px; /* Negative margin to align with edges */
+            padding-left: 30px; /* Add padding back on left */
+            padding-right: 30px; /* Add padding back on right */
+            scrollbar-width: thin;
+            scrollbar-color: #ffca28 #2c2c2c;
         }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+            background: #2c2c2c;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #ffca28;
+            border-radius: 4px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
 
         .card {
             flex: 0 0 auto;

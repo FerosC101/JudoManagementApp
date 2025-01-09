@@ -25,7 +25,6 @@ def login():
         athlete_id = request.form.get('athlete_id')
 
         if not athlete_id:
-            flash("Athlete ID cannot be empty. Please try again.", "error")
             return render_template('login.html')
 
         athlete_id = athlete_id.strip()
@@ -51,7 +50,6 @@ def login():
             else:
                 return redirect(url_for('guest_view'))
         else:
-            flash("Invalid Athlete ID. Please try again or register.", "error")
             return render_template('login.html')
 
     return render_template('login.html')
@@ -67,7 +65,6 @@ def register():
         weight_category = request.form.get('weight_category')
 
         if not name or not age or not weight or not weight_category:
-            flash("All fields are required.", "error")
             return render_template('register.html')
 
         athlete_id = Athlete.generate_athlete_id()
@@ -81,11 +78,9 @@ def register():
             db.session.add(user)
             db.session.commit()
 
-            flash("Registration successful! You can now log in.", "success")
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
-            flash(f"Error during registration: {e}", "error")
             return render_template('register.html')
 
     return render_template('register.html')
@@ -124,7 +119,6 @@ def payment_session_type(athlete_id, training_plan_id):
     training_plan = TrainingPlan.query.filter_by(training_plan_id=training_plan_id).first()
 
     if not athlete or not training_plan:
-        flash("Invalid athlete or training plan.", "error")
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
@@ -132,14 +126,12 @@ def payment_session_type(athlete_id, training_plan_id):
         print(f"Received session_type: {session_type}")
 
         if not session_type:
-            flash("Session type is required.", "error")
             return render_template('payment_session.html',
                                  athlete=athlete,
                                  training_plan=training_plan)
 
         valid_session_types = ['monthly', 'weekly', 'private']
         if session_type not in valid_session_types:
-            flash("Invalid session type selected.", "error")
             return render_template('payment_session.html',
                                  athlete=athlete,
                                  training_plan=training_plan)
@@ -152,7 +144,6 @@ def payment_session_type(athlete_id, training_plan_id):
                                   session_type=session_type))
         except Exception as e:
             print(f"Error in redirect: {str(e)}")
-            flash(f"Error in redirect: {str(e)}", "error")
             return render_template('payment_session.html',
                                  athlete=athlete,
                                  training_plan=training_plan)
@@ -174,14 +165,12 @@ def payment_method(athlete_id, plan_id, session_type):
         print(f"Session Type received: '{session_type}'")
 
         if not athlete or not training_plan:
-            flash("Invalid athlete or training plan.", "error")
             return redirect(url_for('dashboard'))
 
         # Validate session_type
         valid_types = ['monthly', 'weekly', 'private']
         if session_type not in valid_types:
             print(f"Invalid session type: {session_type}")
-            flash("Invalid session type.", "error")
             return redirect(url_for('payment_session_type',
                                   athlete_id=athlete_id,
                                   training_plan_id=plan_id))
@@ -190,7 +179,6 @@ def payment_method(athlete_id, plan_id, session_type):
             payment_method = request.form.get('payment_method')
 
             if not payment_method:
-                flash("Payment method is required.", "error")
                 return render_template('payment_method.html',
                                     athlete=athlete,
                                     training_plan=training_plan,
@@ -222,12 +210,10 @@ def payment_method(athlete_id, plan_id, session_type):
                 db.session.add(new_training)
 
                 db.session.commit()
-                flash("Payment successful and registration completed!", "success")
                 return redirect(url_for('dashboard'))  # Successful redirect
             except Exception as e:
                 print(f"Error during payment processing: {str(e)}")  # Log the error
                 db.session.rollback()
-                flash(f"Error processing payment: {str(e)}", "error")
                 return redirect(url_for('payment_method', athlete_id=athlete_id, plan_id=training_plan.training_plan_id,
                                         session_type=session_type))
 
@@ -238,7 +224,6 @@ def payment_method(athlete_id, plan_id, session_type):
                             session_type=session_type)
 
     except Exception as e:
-        flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for('dashboard'))
 
 
@@ -248,16 +233,14 @@ def register_competition(athlete_id, competition_id):
     competition = Competition.query.filter_by(competition_id=competition_id).first()
 
     if not athlete or not competition:
-        flash("Invalid athlete or competition.", "error")
         return redirect(url_for('dashboard'))
 
     athlete_training = AthleteTraining.query.filter_by(athlete_id=athlete_id).first()
     if not athlete_training:
-        flash("You must be enrolled in a training plan to register for a competition.", "error")
         return redirect(url_for('dashboard'))
 
     training_plan = TrainingPlan.query.filter_by(training_plan_id=athlete_training.training_plan_id).first()
-    if training_plan and training_plan.category in ['Intermediate', 'Elite']:
+    if training_plan and training_plan.category in ['intermediate', 'elite']:
         if request.method == 'POST':
             try:
                 # Check if already registered
@@ -303,7 +286,6 @@ def cancel_training(training_id):
     if not athlete_training:
         if is_ajax:
             return jsonify({'success': False, 'message': 'Training plan not found'}), 404
-        flash('Training plan not found.', 'error')
         return redirect(url_for('dashboard'))
 
     try:
@@ -312,14 +294,12 @@ def cancel_training(training_id):
 
         if is_ajax:
             return jsonify({'success': True, 'message': 'Training plan cancelled successfully'})
-        flash('Training plan cancelled successfully.', 'success')
         return redirect(url_for('dashboard'))
 
     except Exception as e:
         db.session.rollback()
         if is_ajax:
             return jsonify({'success': False, 'message': str(e)}), 500
-        flash(f'Error cancelling training plan: {str(e)}', 'error')
         return redirect(url_for('dashboard'))
 
 
@@ -327,7 +307,6 @@ def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if session.get('role') != 'admin':
-            flash("Access denied.", "error")
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrapper
