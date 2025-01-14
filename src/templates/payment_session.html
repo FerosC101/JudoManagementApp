@@ -119,15 +119,15 @@
     </div>
 
     <script>
-    document.getElementById('sessionForm').onsubmit = function(e) {
-        const sessionType = document.getElementById('session_type').value;
-        if (!sessionType) {
-            e.preventDefault();
-            alert('Please select a session type');
-            return false;
-        }
-        return true;
-    };
+        document.getElementById('sessionForm').onsubmit = function(e) {
+            const sessionType = document.getElementById('session_type').value;
+            if (!sessionType) {
+                e.preventDefault();
+                alert('Please select a session type');
+                return false;
+            }
+            return true;
+        };
     </script>
 </body>
 </html>

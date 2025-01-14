@@ -7,7 +7,8 @@
     <list default="true" id="03513b4b-c883-4152-a923-2a7f9cef49b8" name="Changes" comment="Program done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/login.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/login.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/static/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/script.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,14 +168,10 @@
       <workItem from="1736345138587" duration="10155000" />
       <workItem from="1736355334935" duration="247000" />
       <workItem from="1736386798178" duration="12300000" />
-    </task>
-    <task id="LOCAL-00001" summary="c">
-      <option name="closed" value="true" />
-      <created>1734938559814</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1734938559814</updated>
+      <workItem from="1736425792392" duration="230000" />
+      <workItem from="1736428572738" duration="23000" />
+      <workItem from="1736691371919" duration="6000" />
+      <workItem from="1736856242717" duration="842000" />
     </task>
     <task id="LOCAL-00002" summary="sql set up">
       <option name="closed" value="true" />
@@ -560,7 +557,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736398102436</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Program done">
+      <option name="closed" value="true" />
+      <created>1736425940269</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1736425940270</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

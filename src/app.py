@@ -367,13 +367,11 @@ def delete_athlete(athlete_id):
 @admin_required
 def add_plan():
     try:
-        # Validate required fields
         required_fields = ['plan_name', 'monthly_fee', 'weekly_fee', 'private_hourly_fee', 'category', 'session_per_week']
         for field in required_fields:
             if field not in request.form:
                 return jsonify({'success': False, 'message': f'Missing required field: {field}'}), 400
 
-        # Create plan with all fields
         plan = TrainingPlan(
             plan_name=request.form['plan_name'],
             description=request.form.get('description', ''),  # Optional field
@@ -435,7 +433,6 @@ def delete_plan(training_plan_id):
         if not plan:
             return jsonify({'success': False, 'message': 'Plan not found'}), 404
 
-        # With cascade delete in models, just delete the plan
         db.session.delete(plan)
         db.session.commit()
         return jsonify({'success': True, 'message': 'Plan and all related records deleted successfully'})
@@ -495,7 +492,6 @@ def delete_competition(competition_id):
         if not competition:
             return jsonify({'success': False, 'message': 'Competition not found'}), 404
 
-        # With cascade delete in models, just delete the competition
         db.session.delete(competition)
         db.session.commit()
         return jsonify({'success': True, 'message': 'Competition and all related records deleted successfully'})
